@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kopken Voucher Calc</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0a0a0a;
+  --white: #f5f5f5;
+  --gray-100: #e8e8e8;
+  --gray-200: #d0d0d0;
+  --gray-400: #999;
+  --gray-600: #555;
+  --gray-800: #222;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+
+body {
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--sans);
+  min-height: 100vh;
+  padding: 0 0 80px;
+}
+
+/* TOP BAR */
+.topbar {
+  background: var(--black);
+  color: var(--white);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar-title {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.topbar-sub {
+  font-size: 11px;
+  color: var(--gray-400);
+  font-family: var(--mono);
+}
+
+/* API KEY SECTION */
+.api-section {
+  border-bottom: 1px solid var(--gray-100);
+  padding: 14px 20px;
+  background: #fafafa;
+}
+.api-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.api-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--gray-600);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.api-input {
+  flex: 1;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--black);
+  background: white;
+  outline: none;
+}
+.api-input:focus { border-color: var(--black); }
+.api-save-btn {
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.api-status {
+  font-family: var(--mono);
+  font-size: 10px;
+  margin-top: 6px;
+}
+.api-status.ok { color: #2a7a2a; }
+.api-status.no { color: #999; }
+
+/* VOUCHER STRIP */
+.voucher-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 2px solid var(--black);
+}
+.vs-item {
+  padding: 12px 14px;
+  border-right: 1px solid var(--gray-200);
+}
+.vs-item:last-child { border-right: none; }
+.vs-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.vs-tag.v1 { background: var(--black); color: var(--white); }
+.vs-tag.v2 { background: var(--gray-800); color: var(--white); }
+.vs-tag.v3 { background: var(--gray-200); color: var(--black); }
+.vs-pct {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+}
+.vs-detail {
+  font-size: 10px;
+  color: var(--gray-600);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* MAIN CONTENT */
+.main { padding: 20px; }
+
+/* TIME TOGGLE */
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.time-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray-600);
+}
+.time-toggle {
+  display: flex;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.time-btn {
+  padding: 6px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-600);
+  transition: all 0.15s;
+}
+.time-btn.active {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* TEXTAREA */
+.input-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray-600);
+  margin-bottom: 8px;
+}
+textarea {
+  width: 100%;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--black);
+  background: white;
+  resize: none;
+  height: 200px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+textarea:focus { border-color: var(--black); }
+textarea::placeholder { color: var(--gray-400); }
+
+/* CALC BUTTON */
+.calc-btn {
+  width: 100%;
+  margin-top: 12px;
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.15s;
+}
+.calc-btn:hover { opacity: 0.85; }
+.calc-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* LOADING */
+.loading {
+  display: none;
+  text-align: center;
+  padding: 32px 0;
+}
+.loading.show { display: block; }
+.ld-bar {
+  width: 100%;
+  height: 2px;
+  background: var(--gray-100);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.ld-fill {
+  height: 100%;
+  background: var(--black);
+  animation: slide 1s ease-in-out infinite;
+  width: 40%;
+}
+@keyframes slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+.ld-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-600);
+}
+
+/* ERROR */
+.error-box {
+  display: none;
+  background: #fff0f0;
+  border: 1px solid #f0c0c0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #c00;
+  margin-top: 12px;
+}
+.error-box.show { display: block; }
+
+/* DIVIDER */
+.divider {
+  height: 1px;
+  background: var(--gray-100);
+  margin: 20px 0;
+}
+
+/* RESULT SECTION */
+.result-section { display: none; }
+.result-section.show { display: block; }
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gray-600);
+  margin-bottom: 12px;
+}
+
+/* ORDER CARD */
+.order-card {
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.order-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--black);
+  color: var(--white);
+}
+.order-head-left {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.voucher-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+.badge-v1 { background: white; color: black; }
+.badge-v2 { background: #ccc; color: black; }
+.badge-v3 { background: #666; color: white; }
+
+.order-items { padding: 10px 14px; }
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 0;
+  border-bottom: 1px dotted var(--gray-100);
+}
+.order-item-row:last-child { border-bottom: none; }
+.item-name {
+  font-size: 12px;
+  color: var(--gray-800);
+  flex: 1;
+}
+.item-size {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--gray-400);
+  margin-left: 6px;
+}
+.item-price {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--black);
+  margin-left: 12px;
+}
+
+.order-foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-top: 1px solid var(--gray-100);
+  background: #fafafa;
+}
+.foot-col {
+  padding: 10px 12px;
+  border-right: 1px solid var(--gray-100);
+}
+.foot-col:last-child { border-right: none; }
+.foot-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray-400);
+  margin-bottom: 3px;
+}
+.foot-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--black);
+}
+.foot-val.disc { color: #2a7a2a; }
+.foot-val.pay { color: var(--black); }
+
+/* Payment note */
+.pay-note {
+  padding: 8px 14px;
+  background: #f0fff0;
+  border-top: 1px solid #c8e6c8;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #2a7a2a;
+}
+
+/* SUMMARY */
+.summary-block {
+  border: 2px solid var(--black);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.summary-head {
+  background: var(--black);
+  color: var(--white);
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.summary-rows { padding: 10px 14px; }
+.sum-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dotted var(--gray-100);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.sum-row:last-child { border-bottom: none; }
+.sum-lbl { color: var(--gray-600); }
+.sum-val { font-weight: 600; color: var(--black); }
+.sum-val.green { color: #2a7a2a; }
+.sum-val.big {
+  font-size: 16px;
+}
+
+/* PARSED ITEMS NOTE */
+.parsed-note {
+  background: #f8f8f8;
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--gray-600);
+  line-height: 1.7;
+}
+.parsed-note-title {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gray-400);
+  margin-bottom: 4px;
+}
+
+.warn-box {
+  background: #fffbf0;
+  border: 1px solid #e8d890;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #7a6a00;
+  margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title">KOPKEN VOUCHER CALC</div>
+  </div>
+  <div class="topbar-sub">☕ Kopi Kenangan</div>
+</div>
+
+<!-- API KEY -->
+<div class="api-section">
+  <div class="api-row">
+    <div class="api-label">API Key</div>
+    <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-..." />
+    <button class="api-save-btn" onclick="saveApiKey()">Simpan</button>
+  </div>
+  <div class="api-status no" id="apiStatus">Belum ada API key tersimpan</div>
+</div>
+
+<!-- VOUCHER INFO -->
+<div class="voucher-strip">
+  <div class="vs-item">
+    <div class="vs-tag v1">V1</div>
+    <div class="vs-pct">50%</div>
+    <div class="vs-detail">Min 70rb<br>Maks hemat 30rb</div>
+  </div>
+  <div class="vs-item">
+    <div class="vs-tag v2">V2</div>
+    <div class="vs-pct">50%</div>
+    <div class="vs-detail">Min 50rb<br>Maks hemat 30rb</div>
+  </div>
+  <div class="vs-item">
+    <div class="vs-tag v3">V3</div>
+    <div class="vs-pct">50%</div>
+    <div class="vs-detail">Tanpa min<br>Maks hemat 35rb</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="time-row">
+    <div class="time-label">Jam Order</div>
+    <div class="time-toggle">
+      <button class="time-btn active" id="btnBefore" onclick="setTime('before')">Sebelum 11.00</button>
+      <button class="time-btn" id="btnAfter" onclick="setTime('after')">Setelah 11.00</button>
+    </div>
+  </div>
+
+  <div class="input-label">Paste Pesanan Kamu</div>
+  <textarea id="orderInput" placeholder="Paste format pesanan dari customer di sini...
+
+Contoh:
+• 2x Kopi Kenangan Mantan Rp 28.000
+• 2x Kopi Kenangan Mantan (Large +Rp5.000) Rp 38.000
+• 2x Kopi Kenangan Mantan Frappe (Large) Rp 46.000
+• 1x Thai Tea Rp 15.000
+
+Harga dari teks akan diabaikan — pakai harga database."></textarea>
+
+  <button class="calc-btn" id="calcBtn" onclick="calculate()">→ HITUNG VOUCHER OPTIMAL</button>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="loading" id="loading">
+    <div class="ld-bar"><div class="ld-fill"></div></div>
+    <div class="ld-text">AI membaca pesanan & menghitung kombinasi terbaik...</div>
+  </div>
+
+  <div class="result-section" id="resultSection">
+    <div class="divider"></div>
+    <div class="section-label">Hasil Optimasi Voucher</div>
+    <div id="ordersContainer"></div>
+    <div id="summaryBlock"></div>
+    <div id="parsedNote"></div>
+  </div>
+
+</div>
+
+<script>
+// ===== MENU DATABASE =====
+const MENU_DB = [{"name":"Kopi Kenangan Mantan","category":"Coffee Signature","prices":{"Regular":18000,"Large":25000,"1 Liter":90000}},{"name":"Nobo Aren Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000}},{"name":"Nobo Oatside Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000}},{"name":"Spanish Latte","category":"Coffee Signature","prices":{"Regular":21000,"Large":27000}},{"name":"Honey Macchiato Cream Americano","category":"Coffee Signature","prices":{"Regular":21000,"Large":26000}},{"name":"Honey Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000}},{"name":"Caramel Macchiato","category":"Coffee Signature","prices":{"Regular":28000,"Large":38000,"1 Liter":100000}},{"name":"Butterscotch Seasalt Latte","category":"Coffee Signature","prices":{"Regular":25000,"Large":33000}},{"name":"Butterscotch Aren Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":27000}},{"name":"Creamy Aren Latte","category":"Coffee Signature","prices":{"Regular":24000,"Large":31000}},{"name":"Kopi Susu Black Aren","category":"Coffee Signature","prices":{"Regular":21000,"Large":30000,"1 Liter":95000}},{"name":"Matcha Espresso","category":"Coffee Signature","prices":{"Regular":26000,"Large":35000,"1 Liter":110000}},{"name":"Vanilla Latte","category":"Coffee Signature","prices":{"Regular":26000,"Large":34000,"1 Liter":90000}},{"name":"Avocado Latte","category":"Coffee Signature","prices":{"Regular":28000,"Large":38000}},{"name":"Caramel Latte","category":"Coffee Signature","prices":{"Regular":28000,"Large":34000,"1 Liter":90000}},{"name":"Mocha Latte","category":"Coffee Signature","prices":{"Regular":28000,"Large":38000}},{"name":"Dua Shot Iced Shaken","category":"Coffee Signature","prices":{"Regular":28000,"Large":38000}},{"name":"Hazelnut Latte","category":"Coffee Signature","prices":{"Regular":28000,"Large":34000,"1 Liter":90000}},{"name":"Cappuccino","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000}},{"name":"Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000,"1 Liter":90000}},{"name":"Americano","category":"Coffee Signature","prices":{"Regular":17000,"Large":22000,"1 Liter":75000}},{"name":"Sparks Americano","category":"Coffee Signature","prices":{"Regular":18000}},{"name":"Light Americano","category":"Light Coffee","prices":{"Regular":15000,"Large":20000}},{"name":"Light Mocha Latte","category":"Light Coffee","prices":{"Regular":28000,"Large":33000}},{"name":"Light Kopi Kenangan Mantan","category":"Light Coffee","prices":{"Regular":18000,"Large":23000}},{"name":"Light Caramel Latte","category":"Light Coffee","prices":{"Regular":24000,"Large":29000}},{"name":"Light Hazelnut Latte","category":"Light Coffee","prices":{"Regular":24000,"Large":29000}},{"name":"Light Salted Caramel Macchiato","category":"Light Coffee","prices":{"Regular":28000,"Large":33000}},{"name":"Light Vanilla Latte","category":"Light Coffee","prices":{"Regular":24000,"Large":29000}},{"name":"Light Cappuccino","category":"Light Coffee","prices":{"Regular":19000,"Large":24000}},{"name":"Light Latte","category":"Light Coffee","prices":{"Regular":19000,"Large":24000}},{"name":"Light Dua Shot Iced Shaken","category":"Light Coffee","prices":{"Regular":22000,"Large":27000}},{"name":"Light Kopi Kelapa","category":"Light Coffee","prices":{"Regular":19000,"Large":24000}},{"name":"Nobo Aren Grass Jelly","category":"Non Coffee / Tea","prices":{"Regular":24000,"Large":31000}},{"name":"Dreamy Choco Salted Caramel","category":"Non Coffee / Tea","prices":{"Regular":23000,"Large":30000}},{"name":"Milo Dinosaurus","category":"Non Coffee / Tea","prices":{"Regular":23000,"Large":30000}},{"name":"Matcha Latte","category":"Non Coffee / Tea","prices":{"Regular":25000,"Large":32000,"1 Liter":100000}},{"name":"Avocado Caramel","category":"Non Coffee / Tea","prices":{"Regular":28000,"Large":38000}},{"name":"Avocado Milk","category":"Non Coffee / Tea","prices":{"Regular":24000,"Large":34000}},{"name":"Caramel Dutch Choco","category":"Non Coffee / Tea","prices":{"Regular":24000,"Large":34000}},{"name":"Dutch Chocolate","category":"Non Coffee / Tea","prices":{"Regular":26000,"Large":36000}},{"name":"Hazelnut Dutch Choco","category":"Non Coffee / Tea","prices":{"Regular":28000,"Large":38000}},{"name":"Lemon Black Tea","category":"Non Coffee / Tea","prices":{"Regular":17000,"Large":24000}},{"name":"Oreo Shake","category":"Non Coffee / Tea","prices":{"Regular":26000,"Large":34000}},{"name":"Raspberry Hibiscus","category":"Non Coffee / Tea","prices":{"Regular":20000,"Large":27000}},{"name":"Susu Grass Jelly","category":"Non Coffee / Tea","prices":{"Regular":24000,"Large":32000}},{"name":"Thai Tea","category":"Non Coffee / Tea","prices":{"Regular":22000,"Large":29000,"1 Liter":85000}},{"name":"Hazelnut Choco Milk Tea","category":"Non Coffee / Tea","prices":{"Regular":22000,"Large":29000}},{"name":"Kenangan Milk Tea","category":"Non Coffee / Tea","prices":{"Regular":21000,"Large":27000}},{"name":"Susu Sultan Boba Gula Aren","category":"Non Coffee / Tea","prices":{"Regular":24000}},{"name":"Kenangan Milk Tea with Sultan Boba","category":"Non Coffee / Tea","prices":{"Regular":22000}},{"name":"Kenangan Milk Tea with Grass Jelly Gula Aren","category":"Non Coffee / Tea","prices":{"Regular":22000}},{"name":"Jasmine Earl Grey Milk Tea","category":"Non Coffee / Tea","prices":{"Regular":18000}},{"name":"Thai Green Tea","category":"Non Coffee / Tea","prices":{"Regular":19000}},{"name":"Raspberry Hibiscus Lemon Tea","category":"Non Coffee / Tea","prices":{"Regular":20000}},{"name":"99% Jus Jeruk","category":"Non Coffee / Tea","prices":{"Regular":24000}},{"name":"100% Cokelat","category":"Non Coffee / Tea","prices":{"Regular":28000}},{"name":"Kopi Kenangan Mantan Frappe","category":"Frappe","prices":{"Regular":27000,"Large":34000}},{"name":"Dutch Choco Kenangan Frappe","category":"Frappe","prices":{"Regular":29000,"Large":36000}},{"name":"Vanilla Kenangan Frappe","category":"Frappe","prices":{"Regular":25000,"Large":32000}},{"name":"Butterscotch Kenangan Frappe","category":"Frappe","prices":{"Regular":33000,"Large":40000}},{"name":"Matcha Kenangan Frappe","category":"Frappe","prices":{"Regular":33000,"Large":40000}},{"name":"Strawberry Cromboloni","category":"Snack / Food","prices":{"1 pcs":28000}},{"name":"Sugar Donut","category":"Snack / Food","prices":{"1 pcs":12000}},{"name":"Choco Chip Cookies","category":"Snack / Food","prices":{"1 pcs":16000}},{"name":"Chocolate Croissant","category":"Snack / Food","prices":{"1 pcs":21000}},{"name":"Original KrunChi","category":"Snack / Food","prices":{"1 pcs":19000,"2 pcs":36000,"5 pcs":90000}},{"name":"ChiMate","category":"Snack / Food","prices":{"2 pcs":40000,"5 pcs":138000}},{"name":"Fish Cake","category":"Snack / Food","prices":{"1 pcs":8000}},{"name":"Chicken Nugget","category":"Snack / Food","prices":{"1 pcs":8000}},{"name":"Chicken Ball","category":"Snack / Food","prices":{"1 pcs":8000}},{"name":"Chizy Fries","category":"Snack / Food","prices":{"1 portion":17000}},{"name":"Chizy Beefy Fries","category":"Snack / Food","prices":{"1 portion":25000}},{"name":"Onion Ring","category":"Snack / Food","prices":{"1 portion":14500}},{"name":"Curly Fries","category":"Snack / Food","prices":{"1 portion":24000}},{"name":"Original Fries","category":"Snack / Food","prices":{"1 portion":14500}},{"name":"Sultan Boba","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Grass Jelly","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Marie Regal","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Oreo","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Espresso Shot","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Juwara Beans Upgrade","category":"Topping / Add-on","prices":{"Addon":3000}},{"name":"Oat Milk / Oatside Upgrade","category":"Topping / Add-on","prices":{"Addon":3000}}];
+
+// ===== STATE =====
+let orderTime = 'before';
+let savedApiKey = '';
+
+// ===== INIT =====
+window.addEventListener('load', () => {
+  const stored = localStorage.getItem('kopken_api_key');
+  if (stored) {
+    savedApiKey = stored;
+    document.getElementById('apiKeyInput').value = stored;
+    document.getElementById('apiStatus').textContent = '✓ API key tersimpan di browser';
+    document.getElementById('apiStatus').className = 'api-status ok';
+  }
+});
+
+function saveApiKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val) { alert('Isi API key dulu!'); return; }
+  savedApiKey = val;
+  localStorage.setItem('kopken_api_key', val);
+  document.getElementById('apiStatus').textContent = '✓ API key tersimpan';
+  document.getElementById('apiStatus').className = 'api-status ok';
+}
+
+function setTime(t) {
+  orderTime = t;
+  document.getElementById('btnBefore').classList.toggle('active', t === 'before');
+  document.getElementById('btnAfter').classList.toggle('active', t === 'after');
+}
+
+// ===== FORMAT =====
+function rp(n) { return 'Rp' + n.toLocaleString('id-ID'); }
+
+// ===== VOUCHER LOGIC =====
+const VOUCHERS = {
+  V1: { label: 'V1 (Min 70rb)', min: 70000, disc: 0.5, maxDisc: 30000, badgeClass: 'badge-v1' },
+  V2: { label: 'V2 (Min 50rb)', min: 50000, disc: 0.5, maxDisc: 30000, badgeClass: 'badge-v2' },
+  V3: { label: 'V3 (Tanpa Min)', min: 0,     disc: 0.5, maxDisc: 35000, badgeClass: 'badge-v3' },
+};
+
+function applyVoucher(total, key) {
+  const v = VOUCHERS[key];
+  if (total < v.min) return null;
+  const disc = Math.min(total * v.disc, v.maxDisc);
+  return { key, total, disc, pay: total - disc };
+}
+
+function bestVoucher(total, beforeEleven) {
+  const keys = beforeEleven ? ['V1','V2','V3'] : ['V2','V3'];
+  let best = null;
+  for (const k of keys) {
+    const r = applyVoucher(total, k);
+    if (r && (!best || r.disc > best.disc)) best = r;
+  }
+  if (!best) best = { key: 'V3', total, disc: Math.min(total * 0.5, 35000), pay: total - Math.min(total * 0.5, 35000) };
+  return { ...best, ...VOUCHERS[best.key] };
+}
+
+// ===== OPTIMIZER =====
+// Expand items (qty > 1 → multiple single items)
+function expandItems(items) {
+  const out = [];
+  for (const it of items) {
+    for (let i = 0; i < it.qty; i++) {
+      out.push({ name: it.name, size: it.size, price: it.price });
+    }
+  }
+  return out;
+}
+
+// Try all 2^n-1 partitions for small sets, greedy for large
+function optimizeVouchers(items, beforeEleven) {
+  const flat = expandItems(items);
+  if (flat.length === 0) return [];
+  if (flat.length === 1) {
+    const total = flat[0].price;
+    return [{ items: flat, total, ...bestVoucher(total, beforeEleven) }];
+  }
+
+  // For ≤8 items, try smart grouping exhaustively
+  // Strategy: find best partition maximizing total discount
+  let best = null;
+  let bestDisc = -1;
+
+  // Try groupings: we use a greedy approach optimized for this use case
+  // Main strategies to try:
+  const strategies = generateStrategies(flat, beforeEleven);
+  for (const groups of strategies) {
+    const totalDisc = groups.reduce((s, g) => s + g.disc, 0);
+    if (totalDisc > bestDisc) {
+      bestDisc = totalDisc;
+      best = groups;
+    }
+  }
+  return best || [makeGroup(flat, beforeEleven)];
+}
+
+function makeGroup(items, beforeEleven) {
+  const total = items.reduce((s, it) => s + it.price, 0);
+  return { items, total, ...bestVoucher(total, beforeEleven) };
+}
+
+function generateStrategies(flat, beforeEleven) {
+  const results = [];
+  const n = flat.length;
+
+  // Strategy 1: all in one group
+  results.push([makeGroup(flat, beforeEleven)]);
+
+  // Strategy 2: try splitting into groups of 1 vs rest
+  for (let i = 0; i < n; i++) {
+    const single = [flat[i]];
+    const rest = flat.filter((_, idx) => idx !== i);
+    results.push([makeGroup(single, beforeEleven), makeGroup(rest, beforeEleven)]);
+  }
+
+  // Strategy 3: try all pairs
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const pair = [flat[i], flat[j]];
+      const rest = flat.filter((_, idx) => idx !== i && idx !== j);
+      if (rest.length > 0) {
+        results.push([makeGroup(pair, beforeEleven), makeGroup(rest, beforeEleven)]);
+      }
+    }
+  }
+
+  // Strategy 4: group by reaching 50k threshold
+  // Sort descending and try to form ~50k groups
+  const sorted = [...flat].sort((a, b) => b.price - a.price);
+  let group50 = [], group50total = 0, leftover = [];
+  for (const it of sorted) {
+    if (group50total < 50000) {
+      group50.push(it);
+      group50total += it.price;
+    } else {
+      leftover.push(it);
+    }
+  }
+  if (group50.length > 0 && leftover.length > 0) {
+    results.push([makeGroup(group50, beforeEleven), makeGroup(leftover, beforeEleven)]);
+  }
+  if (group50.length > 0 && leftover.length === 0) {
+    results.push([makeGroup(group50, beforeEleven)]);
+  }
+
+  // Strategy 5: split into 3 groups (each trying to hit 50k)
+  if (n >= 3) {
+    const s = [...flat].sort((a, b) => b.price - a.price);
+    const g1 = [], g2 = [], g3 = [];
+    let t1 = 0, t2 = 0, t3 = 0;
+    for (const it of s) {
+      if (t1 < 50000) { g1.push(it); t1 += it.price; }
+      else if (t2 < 50000) { g2.push(it); t2 += it.price; }
+      else { g3.push(it); t3 += it.price; }
+    }
+    const gs = [g1, g2, g3].filter(g => g.length > 0);
+    if (gs.length > 1) results.push(gs.map(g => makeGroup(g, beforeEleven)));
+  }
+
+  return results;
+}
+
+// ===== AI CALL =====
+async function callAI(orderText) {
+  if (!savedApiKey) throw new Error('API key belum diisi! Isi dulu di bagian atas.');
+
+  const menuList = MENU_DB.map(m => {
+    const prices = Object.entries(m.prices).map(([s, p]) => `${s}:${p}`).join(', ');
+    return `${m.name} [${m.category}] (${prices})`;
+  }).join('\n');
+
+  const systemPrompt = `Kamu adalah parser pesanan Kopi Kenangan. 
+
+DATABASE MENU (format: nama [kategori] (ukuran:harga)):
+${menuList}
+
+TUGASMU:
+- Baca teks pesanan dalam format apapun (bisa ada emoji, bullet, angka harga di teks — ABAIKAN harga di teks)
+- Kenali: nama menu, ukuran (Regular/Large/1 Liter), qty
+- Ukuran default = Regular kecuali ada kata Large/L/large
+- Frappe = cari menu Frappe yang cocok di database
+- Gunakan HARGA DARI DATABASE, bukan harga di teks pesanan
+- Jika ada menu tidak dikenali atau tidak ada di database, masukkan ke unknown_items
+- Jika nama mirip tapi tidak exact match, ambil yang paling dekat
+
+RESPOND ONLY in valid JSON, no markdown, no preamble:
+{
+  "items": [
+    {"name": "nama menu sesuai database", "size": "Regular|Large|1 Liter|1 pcs|Addon|dll", "qty": 1, "price": 18000}
+  ],
+  "unknown_items": ["item yang tidak dikenali"],
+  "notes": "catatan jika ada"
+}`;
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${savedApiKey}` },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      max_tokens: 1000,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: orderText }
+      ]
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${response.status}`);
+  }
+
+  const data = await response.json();
+  const text = data.choices?.[0]?.message?.content || '';
+  const clean = text.replace(/```json|```/g, '').trim();
+  return JSON.parse(clean);
+}
+
+// ===== RENDER =====
+function renderResults(groups, unknownItems, notes) {
+  const container = document.getElementById('ordersContainer');
+  container.innerHTML = '';
+  let grandTotal = 0, grandDisc = 0, grandPay = 0;
+
+  groups.forEach((g, i) => {
+    grandTotal += g.total;
+    grandDisc += g.disc;
+    grandPay += g.pay;
+
+    const card = document.createElement('div');
+    card.className = 'order-card';
+
+    const itemRows = g.items.map(it =>
+      `<div class="order-item-row">
+        <span class="item-name">${it.name}<span class="item-size">${it.size}</span></span>
+        <span class="item-price">${rp(it.price)}</span>
+      </div>`
+    ).join('');
+
+    const hasPayVoucher = g.key === 'V1' && g.pay >= 50000;
+    const payNote = hasPayVoucher
+      ? `<div class="pay-note">💳 Bayar ${rp(g.pay)} → eligible voucher pembayaran min 50rb!</div>`
+      : '';
+
+    card.innerHTML = `
+      <div class="order-head">
+        <div class="order-head-left">TRANSAKSI ${i+1}</div>
+        <div class="voucher-badge ${g.badgeClass}">${g.label}</div>
+      </div>
+      <div class="order-items">${itemRows}</div>
+      <div class="order-foot">
+        <div class="foot-col">
+          <div class="foot-lbl">Subtotal</div>
+          <div class="foot-val">${rp(g.total)}</div>
+        </div>
+        <div class="foot-col">
+          <div class="foot-lbl">Diskon</div>
+          <div class="foot-val disc">−${rp(g.disc)}</div>
+        </div>
+        <div class="foot-col">
+          <div class="foot-lbl">Bayar</div>
+          <div class="foot-val pay">${rp(g.pay)}</div>
+        </div>
+      </div>
+      ${payNote}
+    `;
+    container.appendChild(card);
+  });
+
+  // Summary
+  const savePct = grandTotal > 0 ? Math.round(grandDisc / grandTotal * 100) : 0;
+  const summaryBlock = document.getElementById('summaryBlock');
+  summaryBlock.innerHTML = `
+    <div class="summary-block">
+      <div class="summary-head">RINGKASAN TOTAL</div>
+      <div class="summary-rows">
+        <div class="sum-row"><span class="sum-lbl">Total semua item</span><span class="sum-val">${rp(grandTotal)}</span></div>
+        <div class="sum-row"><span class="sum-lbl">Total hemat voucher</span><span class="sum-val green">−${rp(grandDisc)} (${savePct}%)</span></div>
+        <div class="sum-row"><span class="sum-lbl">Total yang kamu bayar</span><span class="sum-val big">${rp(grandPay)}</span></div>
+        <div class="sum-row"><span class="sum-lbl">Jumlah transaksi</span><span class="sum-val">${groups.length}x checkout</span></div>
+      </div>
+    </div>
+  `;
+
+  // Notes / unknown
+  const parsedNote = document.getElementById('parsedNote');
+  let noteHtml = '';
+  if (unknownItems && unknownItems.length > 0) {
+    noteHtml += `<div class="warn-box">⚠️ Item tidak dikenali di database: ${unknownItems.join(', ')}</div>`;
+  }
+  if (notes) {
+    noteHtml += `<div class="parsed-note"><div class="parsed-note-title">Catatan AI</div>${notes}</div>`;
+  }
+  parsedNote.innerHTML = noteHtml;
+}
+
+// ===== MAIN =====
+async function calculate() {
+  const input = document.getElementById('orderInput').value.trim();
+  if (!input) { showError('Paste pesanan dulu!'); return; }
+  if (!savedApiKey) { showError('Isi dan simpan API key dulu di bagian atas!'); return; }
+
+  hideError();
+  document.getElementById('resultSection').classList.remove('show');
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('calcBtn').disabled = true;
+
+  try {
+    const parsed = await callAI(input);
+    if (!parsed.items || parsed.items.length === 0) throw new Error('Tidak ada item yang terbaca. Coba paste ulang pesanannya.');
+
+    const groups = optimizeVouchers(parsed.items, orderTime === 'before');
+    renderResults(groups, parsed.unknown_items, parsed.notes);
+
+    document.getElementById('resultSection').classList.add('show');
+    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    document.getElementById('loading').classList.remove('show');
+    document.getElementById('calcBtn').disabled = false;
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('show');
+}
+function hideError() {
+  document.getElementById('errorBox').classList.remove('show');
+}
+</script>
+</body>
+</html>
