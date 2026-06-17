@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kopken Voucher Calc</title>
+<title>Kopken Tools</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
   --black: #0a0a0a;
   --white: #f5f5f5;
@@ -19,521 +18,384 @@
   --mono: 'IBM Plex Mono', monospace;
   --sans: 'IBM Plex Sans', sans-serif;
 }
+body { background: var(--white); color: var(--black); font-family: var(--sans); min-height: 100vh; padding-bottom: 80px; }
 
-body {
-  background: var(--white);
-  color: var(--black);
-  font-family: var(--sans);
-  min-height: 100vh;
-  padding: 0 0 80px;
-}
-
-/* TOP BAR */
-.topbar {
-  background: var(--black);
-  color: var(--white);
-  padding: 14px 20px;
+/* NAV TABS */
+.nav-tabs {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  background: var(--black);
+  position: sticky; top: 0; z-index: 20;
 }
-.topbar-title {
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+.nav-tab {
+  flex: 1; padding: 14px 8px;
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.5px; text-align: center; cursor: pointer;
+  color: var(--gray-400); border-bottom: 2px solid transparent;
+  transition: all 0.15s; user-select: none;
 }
-.topbar-sub {
-  font-size: 11px;
-  color: var(--gray-400);
-  font-family: var(--mono);
-}
+.nav-tab.active { color: var(--white); border-bottom-color: var(--white); }
 
-/* API KEY SECTION */
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* API KEY */
 .api-section {
   border-bottom: 1px solid var(--gray-100);
-  padding: 14px 20px;
-  background: #fafafa;
+  padding: 12px 20px; background: #fafafa;
 }
-.api-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.api-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--gray-600);
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-.api-input {
-  flex: 1;
-  border: 1px solid var(--gray-200);
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--black);
-  background: white;
-  outline: none;
-}
+.api-row { display: flex; gap: 8px; align-items: center; }
+.api-label { font-family: var(--mono); font-size: 10px; color: var(--gray-600); letter-spacing: 0.5px; white-space: nowrap; text-transform: uppercase; }
+.api-input { flex: 1; border: 1px solid var(--gray-200); border-radius: 6px; padding: 8px 10px; font-family: var(--mono); font-size: 11px; color: var(--black); background: white; outline: none; }
 .api-input:focus { border-color: var(--black); }
-.api-save-btn {
-  background: var(--black);
-  color: var(--white);
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-family: var(--mono);
-  font-size: 11px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.api-status {
-  font-family: var(--mono);
-  font-size: 10px;
-  margin-top: 6px;
-}
+.api-save-btn { background: var(--black); color: var(--white); border: none; border-radius: 6px; padding: 8px 14px; font-family: var(--mono); font-size: 11px; cursor: pointer; white-space: nowrap; }
+.api-status { font-family: var(--mono); font-size: 10px; margin-top: 5px; }
 .api-status.ok { color: #2a7a2a; }
 .api-status.no { color: #999; }
 
 /* VOUCHER STRIP */
-.voucher-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-bottom: 2px solid var(--black);
-}
-.vs-item {
-  padding: 12px 14px;
-  border-right: 1px solid var(--gray-200);
-}
+.voucher-strip { display: grid; grid-template-columns: repeat(3,1fr); border-bottom: 2px solid var(--black); }
+.vs-item { padding: 10px 12px; border-right: 1px solid var(--gray-200); }
 .vs-item:last-child { border-right: none; }
-.vs-tag {
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: 2px 6px;
-  border-radius: 3px;
-  display: inline-block;
-  margin-bottom: 6px;
-}
+.vs-tag { font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; display: inline-block; margin-bottom: 5px; }
 .vs-tag.v1 { background: var(--black); color: var(--white); }
 .vs-tag.v2 { background: var(--gray-800); color: var(--white); }
 .vs-tag.v3 { background: var(--gray-200); color: var(--black); }
-.vs-pct {
-  font-family: var(--mono);
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1;
-}
-.vs-detail {
-  font-size: 10px;
-  color: var(--gray-600);
-  margin-top: 3px;
-  line-height: 1.4;
-}
+.vs-pct { font-family: var(--mono); font-size: 18px; font-weight: 600; line-height: 1; }
+.vs-detail { font-size: 9px; color: var(--gray-600); margin-top: 3px; line-height: 1.4; }
 
-/* MAIN CONTENT */
-.main { padding: 20px; }
-
-/* TIME TOGGLE */
-.time-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.time-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--gray-600);
-}
-.time-toggle {
-  display: flex;
-  border: 1px solid var(--gray-200);
-  border-radius: 6px;
-  overflow: hidden;
-}
-.time-btn {
-  padding: 6px 12px;
-  font-family: var(--mono);
-  font-size: 11px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--gray-600);
-  transition: all 0.15s;
-}
-.time-btn.active {
-  background: var(--black);
-  color: var(--white);
-}
-
-/* TEXTAREA */
-.input-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--gray-600);
-  margin-bottom: 8px;
-}
-textarea {
-  width: 100%;
-  border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  padding: 14px;
-  font-family: var(--mono);
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--black);
-  background: white;
-  resize: none;
-  height: 200px;
-  outline: none;
-  transition: border-color 0.15s;
-}
+/* MAIN */
+.main { padding: 18px 20px; }
+.time-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.time-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-600); }
+.time-toggle { display: flex; border: 1px solid var(--gray-200); border-radius: 6px; overflow: hidden; }
+.time-btn { padding: 6px 12px; font-family: var(--mono); font-size: 11px; background: none; border: none; cursor: pointer; color: var(--gray-600); transition: all 0.15s; }
+.time-btn.active { background: var(--black); color: var(--white); }
+.input-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-600); margin-bottom: 8px; }
+textarea { width: 100%; border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px; font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--black); background: white; resize: none; height: 200px; outline: none; transition: border-color 0.15s; }
 textarea:focus { border-color: var(--black); }
 textarea::placeholder { color: var(--gray-400); }
-
-/* CALC BUTTON */
-.calc-btn {
-  width: 100%;
-  margin-top: 12px;
-  background: var(--black);
-  color: var(--white);
-  border: none;
-  border-radius: 8px;
-  padding: 14px;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  letter-spacing: 0.5px;
-  transition: opacity 0.15s;
-}
+.calc-btn { width: 100%; margin-top: 12px; background: var(--black); color: var(--white); border: none; border-radius: 8px; padding: 14px; font-family: var(--mono); font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px; transition: opacity 0.15s; }
 .calc-btn:hover { opacity: 0.85; }
 .calc-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* LOADING */
-.loading {
-  display: none;
-  text-align: center;
-  padding: 32px 0;
-}
+.loading { display: none; text-align: center; padding: 28px 0; }
 .loading.show { display: block; }
-.ld-bar {
-  width: 100%;
-  height: 2px;
-  background: var(--gray-100);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 14px;
-}
-.ld-fill {
-  height: 100%;
-  background: var(--black);
-  animation: slide 1s ease-in-out infinite;
-  width: 40%;
-}
-@keyframes slide {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(350%); }
-}
-.ld-text {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--gray-600);
-}
+.ld-bar { width: 100%; height: 2px; background: var(--gray-100); border-radius: 2px; overflow: hidden; margin-bottom: 12px; }
+.ld-fill { height: 100%; background: var(--black); animation: slide 1s ease-in-out infinite; width: 40%; }
+@keyframes slide { 0%{transform:translateX(-100%)} 100%{transform:translateX(350%)} }
+.ld-text { font-family: var(--mono); font-size: 11px; color: var(--gray-600); }
 
 /* ERROR */
-.error-box {
-  display: none;
-  background: #fff0f0;
-  border: 1px solid #f0c0c0;
-  border-radius: 8px;
-  padding: 12px 14px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: #c00;
-  margin-top: 12px;
-}
+.error-box { display: none; background: #fff0f0; border: 1px solid #f0c0c0; border-radius: 8px; padding: 12px 14px; font-family: var(--mono); font-size: 11px; color: #c00; margin-top: 12px; }
 .error-box.show { display: block; }
+.divider { height: 1px; background: var(--gray-100); margin: 18px 0; }
 
-/* DIVIDER */
-.divider {
-  height: 1px;
-  background: var(--gray-100);
-  margin: 20px 0;
-}
-
-/* RESULT SECTION */
+/* RESULT */
 .result-section { display: none; }
 .result-section.show { display: block; }
-
-.section-label {
-  font-family: var(--mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--gray-600);
-  margin-bottom: 12px;
-}
+.section-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-600); margin-bottom: 12px; }
 
 /* ORDER CARD */
-.order-card {
-  border: 1px solid var(--gray-200);
-  border-radius: 10px;
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-.order-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 14px;
-  background: var(--black);
-  color: var(--white);
-}
-.order-head-left {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-.voucher-badge {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 3px;
-  letter-spacing: 0.5px;
-}
+.order-card { border: 1px solid var(--gray-200); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+.order-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--black); color: var(--white); }
+.order-head-left { font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+.voucher-badge { font-family: var(--mono); font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 3px; letter-spacing: 0.5px; }
 .badge-v1 { background: white; color: black; }
 .badge-v2 { background: #ccc; color: black; }
 .badge-v3 { background: #666; color: white; }
-
 .order-items { padding: 10px 14px; }
-.order-item-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 4px 0;
-  border-bottom: 1px dotted var(--gray-100);
-}
+.order-item-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 1px dotted var(--gray-100); }
 .order-item-row:last-child { border-bottom: none; }
-.item-name {
-  font-size: 12px;
-  color: var(--gray-800);
-  flex: 1;
-}
-.item-size {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--gray-400);
-  margin-left: 6px;
-}
-.item-price {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--black);
-  margin-left: 12px;
-}
-
-.order-foot {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  border-top: 1px solid var(--gray-100);
-  background: #fafafa;
-}
-.foot-col {
-  padding: 10px 12px;
-  border-right: 1px solid var(--gray-100);
-}
+.item-name { font-size: 12px; color: var(--gray-800); flex: 1; }
+.item-size { font-family: var(--mono); font-size: 10px; color: var(--gray-400); margin-left: 6px; }
+.item-price { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--black); margin-left: 12px; }
+.order-foot { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid var(--gray-100); background: #fafafa; }
+.foot-col { padding: 10px 12px; border-right: 1px solid var(--gray-100); }
 .foot-col:last-child { border-right: none; }
-.foot-lbl {
-  font-family: var(--mono);
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--gray-400);
-  margin-bottom: 3px;
-}
-.foot-val {
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--black);
-}
+.foot-lbl { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-400); margin-bottom: 3px; }
+.foot-val { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--black); }
 .foot-val.disc { color: #2a7a2a; }
-.foot-val.pay { color: var(--black); }
-
-/* Payment note */
-.pay-note {
-  padding: 8px 14px;
-  background: #f0fff0;
-  border-top: 1px solid #c8e6c8;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: #2a7a2a;
-}
+.pay-note { padding: 8px 14px; background: #f0fff0; border-top: 1px solid #c8e6c8; font-family: var(--mono); font-size: 10px; color: #2a7a2a; }
+.v3-note { padding: 8px 14px; background: #fffbf0; border-top: 1px solid #e8d890; font-family: var(--mono); font-size: 10px; color: #7a6a00; }
 
 /* SUMMARY */
-.summary-block {
-  border: 2px solid var(--black);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 4px;
-}
-.summary-head {
-  background: var(--black);
-  color: var(--white);
-  padding: 10px 14px;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
+.summary-block { border: 2px solid var(--black); border-radius: 10px; overflow: hidden; margin-top: 4px; }
+.summary-head { background: var(--black); color: var(--white); padding: 10px 14px; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
 .summary-rows { padding: 10px 14px; }
-.sum-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px dotted var(--gray-100);
-  font-family: var(--mono);
-  font-size: 12px;
-}
+.sum-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dotted var(--gray-100); font-family: var(--mono); font-size: 12px; }
 .sum-row:last-child { border-bottom: none; }
 .sum-lbl { color: var(--gray-600); }
 .sum-val { font-weight: 600; color: var(--black); }
 .sum-val.green { color: #2a7a2a; }
-.sum-val.big {
-  font-size: 16px;
-}
+.sum-val.big { font-size: 16px; }
+.parsed-note { background: #f8f8f8; border: 1px solid var(--gray-100); border-radius: 8px; padding: 10px 14px; margin-top: 12px; font-family: var(--mono); font-size: 10px; color: var(--gray-600); line-height: 1.7; }
+.parsed-note-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-400); margin-bottom: 4px; }
+.warn-box { background: #fffbf0; border: 1px solid #e8d890; border-radius: 8px; padding: 8px 12px; font-family: var(--mono); font-size: 10px; color: #7a6a00; margin-top: 10px; }
 
-/* PARSED ITEMS NOTE */
-.parsed-note {
-  background: #f8f8f8;
-  border: 1px solid var(--gray-100);
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-top: 12px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--gray-600);
-  line-height: 1.7;
+/* ===== PHONE PAGE ===== */
+.phone-page { padding: 18px 20px; }
+.phone-header { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start; }
+.phone-title { font-family: var(--mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-600); margin-bottom: 4px; }
+.phone-sub { font-size: 11px; color: var(--gray-400); font-family: var(--mono); }
+.phone-reset-btn { font-family: var(--mono); font-size: 10px; background: none; border: 1px solid var(--gray-200); border-radius: 6px; padding: 5px 10px; color: var(--gray-600); cursor: pointer; }
+.phone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.phone-card { display: flex; flex-direction: column; border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden; background: white; transition: border-color 0.15s; }
+.phone-card.used { background: #f8f8f8; border-color: var(--gray-100); }
+.phone-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; cursor: pointer; user-select: none; transition: background 0.12s; }
+.phone-top:active { background: var(--black); }
+.phone-top:active .phone-num { color: var(--white); }
+.phone-top:active .phone-copy-lbl { color: var(--gray-400); }
+.phone-card.used .phone-top { cursor: default; pointer-events: none; }
+.phone-num { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--black); }
+.phone-card.used .phone-num { color: var(--gray-400); text-decoration: line-through; }
+.phone-copy-lbl { font-family: var(--mono); font-size: 9px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
+.phone-actions { display: flex; border-top: 1px solid var(--gray-100); }
+.phone-action-btn { flex: 1; padding: 6px 4px; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; cursor: pointer; background: none; border: none; color: var(--gray-600); transition: background 0.12s; }
+.phone-action-btn:active { background: var(--gray-100); }
+.used-btn {}
+.restore-btn { display: none; color: #2a7a2a; }
+.phone-card.used .used-btn { display: none; }
+.phone-card.used .restore-btn { display: block; flex: 1; }
+.phone-card.used .phone-actions { background: #f0fff0; border-top-color: #c8e6c8; }
+.phone-stats { font-family: var(--mono); font-size: 10px; color: var(--gray-400); margin-top: 14px; text-align: center; }
+.phone-stats span { color: var(--black); font-weight: 600; }
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--black); color: var(--white); font-family: var(--mono);
+  font-size: 12px; padding: 10px 20px; border-radius: 20px;
+  opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999;
+  white-space: nowrap;
 }
-.parsed-note-title {
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--gray-400);
-  margin-bottom: 4px;
-}
-
-.warn-box {
-  background: #fffbf0;
-  border: 1px solid #e8d890;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: #7a6a00;
-  margin-top: 10px;
-}
+.toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="topbar">
-  <div>
-    <div class="topbar-title">KOPKEN VOUCHER CALC</div>
-  </div>
-  <div class="topbar-sub">☕ Kopi Kenangan</div>
+<!-- NAV -->
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchPage('voucher')">☕ Voucher Calc</div>
+  <div class="nav-tab" onclick="switchPage('phone')">📞 Nomor CS</div>
 </div>
 
-<!-- API KEY -->
-<div class="api-section">
-  <div class="api-row">
-    <div class="api-label">API Key</div>
-    <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-..." />
-    <button class="api-save-btn" onclick="saveApiKey()">Simpan</button>
-  </div>
-  <div class="api-status no" id="apiStatus">Belum ada API key tersimpan</div>
-</div>
+<!-- ===== PAGE: VOUCHER ===== -->
+<div class="page active" id="page-voucher">
 
-<!-- VOUCHER INFO -->
-<div class="voucher-strip">
-  <div class="vs-item">
-    <div class="vs-tag v1">V1</div>
-    <div class="vs-pct">50%</div>
-    <div class="vs-detail">Min 70rb<br>Maks hemat 30rb</div>
+  <div class="api-section">
+    <div class="api-row">
+      <div class="api-label">API Key</div>
+      <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-..." />
+      <button class="api-save-btn" onclick="saveApiKey()">Simpan</button>
+    </div>
+    <div class="api-status no" id="apiStatus">Belum ada API key tersimpan</div>
   </div>
-  <div class="vs-item">
-    <div class="vs-tag v2">V2</div>
-    <div class="vs-pct">50%</div>
-    <div class="vs-detail">Min 50rb<br>Maks hemat 30rb</div>
-  </div>
-  <div class="vs-item">
-    <div class="vs-tag v3">V3</div>
-    <div class="vs-pct">50%</div>
-    <div class="vs-detail">Tanpa min<br>Maks hemat 35rb</div>
-  </div>
-</div>
 
-<!-- MAIN -->
-<div class="main">
-
-  <div class="time-row">
-    <div class="time-label">Jam Order</div>
-    <div class="time-toggle">
-      <button class="time-btn active" id="btnBefore" onclick="setTime('before')">Sebelum 11.00</button>
-      <button class="time-btn" id="btnAfter" onclick="setTime('after')">Setelah 11.00</button>
+  <div class="voucher-strip">
+    <div class="vs-item">
+      <div class="vs-tag v1">V1</div>
+      <div class="vs-pct">50%</div>
+      <div class="vs-detail">Min 70rb<br>Maks hemat 30rb<br><b>Sebelum 11.00</b></div>
+    </div>
+    <div class="vs-item">
+      <div class="vs-tag v2">V2</div>
+      <div class="vs-pct">50%</div>
+      <div class="vs-detail">Min 50rb<br>Maks hemat 30rb<br><b>Prioritas utama</b></div>
+    </div>
+    <div class="vs-item">
+      <div class="vs-tag v3">V3</div>
+      <div class="vs-pct">50%</div>
+      <div class="vs-detail">Tanpa min<br>Maks hemat 35rb<br><b>Darurat saja</b></div>
     </div>
   </div>
 
-  <div class="input-label">Paste Pesanan Kamu</div>
-  <textarea id="orderInput" placeholder="Paste format pesanan dari customer di sini...
+  <div class="main">
+    <div class="time-row">
+      <div class="time-label">Jam Order</div>
+      <div class="time-toggle">
+        <button class="time-btn active" id="btnBefore" onclick="setTime('before')">Sebelum 11.00</button>
+        <button class="time-btn" id="btnAfter" onclick="setTime('after')">Setelah 11.00</button>
+      </div>
+    </div>
 
-Contoh:
+    <div class="input-label">Paste Pesanan</div>
+    <textarea id="orderInput" placeholder="Paste format pesanan dari customer:
+
 • 2x Kopi Kenangan Mantan Rp 28.000
-• 2x Kopi Kenangan Mantan (Large +Rp5.000) Rp 38.000
-• 2x Kopi Kenangan Mantan Frappe (Large) Rp 46.000
+• 2x Kopi Kenangan Mantan (Large) Rp 38.000
 • 1x Thai Tea Rp 15.000
 
-Harga dari teks akan diabaikan — pakai harga database."></textarea>
+Harga di teks diabaikan — pakai harga database."></textarea>
 
-  <button class="calc-btn" id="calcBtn" onclick="calculate()">→ HITUNG VOUCHER OPTIMAL</button>
+    <button class="calc-btn" id="calcBtn" onclick="calculate()">→ HITUNG VOUCHER OPTIMAL</button>
+    <div class="error-box" id="errorBox"></div>
+    <div class="loading" id="loading">
+      <div class="ld-bar"><div class="ld-fill"></div></div>
+      <div class="ld-text">Membaca pesanan & mencari kombinasi terbaik...</div>
+    </div>
 
-  <div class="error-box" id="errorBox"></div>
-
-  <div class="loading" id="loading">
-    <div class="ld-bar"><div class="ld-fill"></div></div>
-    <div class="ld-text">AI membaca pesanan & menghitung kombinasi terbaik...</div>
+    <div class="result-section" id="resultSection">
+      <div class="divider"></div>
+      <div class="section-label">Hasil Optimasi Voucher</div>
+      <div id="ordersContainer"></div>
+      <div id="summaryBlock"></div>
+      <div id="parsedNote"></div>
+    </div>
   </div>
-
-  <div class="result-section" id="resultSection">
-    <div class="divider"></div>
-    <div class="section-label">Hasil Optimasi Voucher</div>
-    <div id="ordersContainer"></div>
-    <div id="summaryBlock"></div>
-    <div id="parsedNote"></div>
-  </div>
-
 </div>
 
+<!-- ===== PAGE: PHONE ===== -->
+<div class="page" id="page-phone">
+  <div class="phone-page">
+    <div class="phone-header">
+      <div>
+        <div class="phone-title">Nomor CS / Outlet</div>
+        <div class="phone-sub">Tap nomor → salin · tandai terpakai</div>
+      </div>
+      <button class="phone-reset-btn" onclick="resetAllUsed()">Reset Semua</button>
+    </div>
+    <div class="phone-grid" id="phoneGrid"></div>
+    <div class="phone-stats" id="phoneStats"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
+// ===== NAVIGATION =====
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===== PHONE NUMBERS =====
+const PHONES = [
+  '82227137267','85697652932','83849830614','85786583871',
+  '83116121097','83896229664','83119176811','83119001358',
+  '83875926340','82189847427','85741915711','85194931560',
+  '82277598385','83119007870','85182163223','85786583887',
+  '83119006277','85166893869','83898586197','83116126363',
+  '82227479520','85786582329','85741913725','85786583889',
+  '83857910176','82121295291','85786583525','82381485010',
+  '85786583574','83116129455','83899125118','83119002477',
+  '83896229371','83857350884','85187722376','83857910223',
+  '83164213649','82175697926','83116126711','85700101297',
+  '85741874595','83119007257','81217913987','85786583863',
+  '81215720790',
+  '83165492691','83182054067','83186131871','83182056067',
+  '83872855422','83847060857','83821228658','83171094123',
+  '83152185946','83847061045','85179376685','85179377943',
+  '85150119700','85182150251','81253776560','82163550988',
+  '85179379012','85180180148','85180180304','83870476959',
+  '83876077673','85179377918','85179376503','85179377557',
+  '85182877284','85182877281','85180185172','85180183116',
+  '85182150198','85182150184','85194798366','85182150183',
+  '85182150237','85182150233','85134162137','85136849364',
+  '85134744507','85133047989','85133047934','85134726014',
+  '85133047920','85136838510','85143449443','85135461474',
+  '85147196718','8881676605','8811360905','8818684287',
+  '83843304700','83822846219',
+  '85820033392','85651245699','85196531904','85696403985',
+  '85196531440','85696403554','85196531695','85196531473',
+  '85196531589','85196531396','85820033329','85196532258',
+  '85196531513','85196531624','85864255330','85196531484',
+  '85196531545','85696404352','85196531569','85196532050',
+  '85196532153','85196531928','85745597980','85196531521',
+  '85196531939','85651245651','85196531925','85196531587'
+];
+
+// Load used state from localStorage
+function getUsedSet() {
+  try { return new Set(JSON.parse(localStorage.getItem('kopken_used_phones') || '[]')); }
+  catch { return new Set(); }
+}
+function saveUsedSet(s) {
+  localStorage.setItem('kopken_used_phones', JSON.stringify([...s]));
+}
+
+function buildPhoneGrid() {
+  const grid = document.getElementById('phoneGrid');
+  const used = getUsedSet();
+  PHONES.forEach((num, i) => {
+    const card = document.createElement('div');
+    card.className = 'phone-card' + (used.has(num) ? ' used' : '');
+    card.id = 'ph-' + i;
+    card.innerHTML = `
+      <div class="phone-top" onclick="copyPhone('${num}', ${i})">
+        <span class="phone-num">0${num}</span>
+        <span class="phone-copy-lbl">salin</span>
+      </div>
+      <div class="phone-actions">
+        <button class="phone-action-btn used-btn" onclick="markUsed('${num}', ${i})">✕ Sudah Terpakai</button>
+        <button class="phone-action-btn restore-btn" onclick="restorePhone('${num}', ${i})">↩ Pulihkan</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  updateStats();
+}
+
+function copyPhone(num, idx) {
+  const card = document.getElementById('ph-' + idx);
+  if (card.classList.contains('used')) return;
+  const full = '0' + num;
+  const doFlash = () => {
+    const lbl = card.querySelector('.phone-copy-lbl');
+    lbl.textContent = '✓';
+    card.style.borderColor = '#c8e6c8';
+    setTimeout(() => { lbl.textContent = 'salin'; card.style.borderColor = ''; }, 1800);
+    showToast(full + ' tersalin!');
+  };
+  navigator.clipboard.writeText(full).then(doFlash).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = full; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    doFlash();
+  });
+}
+
+function markUsed(num, idx) {
+  const used = getUsedSet();
+  used.add(num);
+  saveUsedSet(used);
+  document.getElementById('ph-' + idx).classList.add('used');
+  updateStats();
+  showToast('Ditandai terpakai');
+}
+
+function restorePhone(num, idx) {
+  const used = getUsedSet();
+  used.delete(num);
+  saveUsedSet(used);
+  document.getElementById('ph-' + idx).classList.remove('used');
+  updateStats();
+  showToast('Dipulihkan');
+}
+
+function resetAllUsed() {
+  if (!confirm('Reset semua nomor ke aktif?')) return;
+  saveUsedSet(new Set());
+  document.querySelectorAll('.phone-card.used').forEach(c => c.classList.remove('used'));
+  updateStats();
+}
+
+function updateStats() {
+  const used = getUsedSet();
+  const total = PHONES.length;
+  const usedCount = [...used].filter(n => PHONES.includes(n)).length;
+  const el = document.getElementById('phoneStats');
+  if (el) el.innerHTML = `<span>${total - usedCount}</span> aktif · <span>${usedCount}</span> terpakai dari ${total} nomor`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
 // ===== MENU DATABASE =====
 const MENU_DB = [{"name":"Kopi Kenangan Mantan","category":"Coffee Signature","prices":{"Regular":18000,"Large":25000,"1 Liter":90000}},{"name":"Nobo Aren Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000}},{"name":"Nobo Oatside Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000}},{"name":"Spanish Latte","category":"Coffee Signature","prices":{"Regular":21000,"Large":27000}},{"name":"Honey Macchiato Cream Americano","category":"Coffee Signature","prices":{"Regular":21000,"Large":26000}},{"name":"Honey Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000}},{"name":"Caramel Macchiato","category":"Coffee Signature","prices":{"Regular":28000,"Large":38000,"1 Liter":100000}},{"name":"Butterscotch Seasalt Latte","category":"Coffee Signature","prices":{"Regular":25000,"Large":33000}},{"name":"Butterscotch Aren Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":27000}},{"name":"Creamy Aren Latte","category":"Coffee Signature","prices":{"Regular":24000,"Large":31000}},{"name":"Kopi Susu Black Aren","category":"Coffee Signature","prices":{"Regular":21000,"Large":30000,"1 Liter":95000}},{"name":"Matcha Espresso","category":"Coffee Signature","prices":{"Regular":26000,"Large":35000,"1 Liter":110000}},{"name":"Vanilla Latte","category":"Coffee Signature","prices":{"Regular":26000,"Large":34000,"1 Liter":90000}},{"name":"Avocado Latte","category":"Coffee Signature","prices":{"Regular":28000,"Large":38000}},{"name":"Caramel Latte","category":"Coffee Signature","prices":{"Regular":28000,"Large":34000,"1 Liter":90000}},{"name":"Mocha Latte","category":"Coffee Signature","prices":{"Regular":28000,"Large":38000}},{"name":"Dua Shot Iced Shaken","category":"Coffee Signature","prices":{"Regular":28000,"Large":38000}},{"name":"Hazelnut Latte","category":"Coffee Signature","prices":{"Regular":28000,"Large":34000,"1 Liter":90000}},{"name":"Cappuccino","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000}},{"name":"Latte","category":"Coffee Signature","prices":{"Regular":22000,"Large":29000,"1 Liter":90000}},{"name":"Americano","category":"Coffee Signature","prices":{"Regular":17000,"Large":22000,"1 Liter":75000}},{"name":"Sparks Americano","category":"Coffee Signature","prices":{"Regular":18000}},{"name":"Light Americano","category":"Light Coffee","prices":{"Regular":15000,"Large":20000}},{"name":"Light Mocha Latte","category":"Light Coffee","prices":{"Regular":28000,"Large":33000}},{"name":"Light Kopi Kenangan Mantan","category":"Light Coffee","prices":{"Regular":18000,"Large":23000}},{"name":"Light Caramel Latte","category":"Light Coffee","prices":{"Regular":24000,"Large":29000}},{"name":"Light Hazelnut Latte","category":"Light Coffee","prices":{"Regular":24000,"Large":29000}},{"name":"Light Salted Caramel Macchiato","category":"Light Coffee","prices":{"Regular":28000,"Large":33000}},{"name":"Light Vanilla Latte","category":"Light Coffee","prices":{"Regular":24000,"Large":29000}},{"name":"Light Cappuccino","category":"Light Coffee","prices":{"Regular":19000,"Large":24000}},{"name":"Light Latte","category":"Light Coffee","prices":{"Regular":19000,"Large":24000}},{"name":"Light Dua Shot Iced Shaken","category":"Light Coffee","prices":{"Regular":22000,"Large":27000}},{"name":"Light Kopi Kelapa","category":"Light Coffee","prices":{"Regular":19000,"Large":24000}},{"name":"Nobo Aren Grass Jelly","category":"Non Coffee / Tea","prices":{"Regular":24000,"Large":31000}},{"name":"Dreamy Choco Salted Caramel","category":"Non Coffee / Tea","prices":{"Regular":23000,"Large":30000}},{"name":"Milo Dinosaurus","category":"Non Coffee / Tea","prices":{"Regular":23000,"Large":30000}},{"name":"Matcha Latte","category":"Non Coffee / Tea","prices":{"Regular":25000,"Large":32000,"1 Liter":100000}},{"name":"Avocado Caramel","category":"Non Coffee / Tea","prices":{"Regular":28000,"Large":38000}},{"name":"Avocado Milk","category":"Non Coffee / Tea","prices":{"Regular":24000,"Large":34000}},{"name":"Caramel Dutch Choco","category":"Non Coffee / Tea","prices":{"Regular":24000,"Large":34000}},{"name":"Dutch Chocolate","category":"Non Coffee / Tea","prices":{"Regular":26000,"Large":36000}},{"name":"Hazelnut Dutch Choco","category":"Non Coffee / Tea","prices":{"Regular":28000,"Large":38000}},{"name":"Lemon Black Tea","category":"Non Coffee / Tea","prices":{"Regular":17000,"Large":24000}},{"name":"Oreo Shake","category":"Non Coffee / Tea","prices":{"Regular":26000,"Large":34000}},{"name":"Raspberry Hibiscus","category":"Non Coffee / Tea","prices":{"Regular":20000,"Large":27000}},{"name":"Susu Grass Jelly","category":"Non Coffee / Tea","prices":{"Regular":24000,"Large":32000}},{"name":"Thai Tea","category":"Non Coffee / Tea","prices":{"Regular":22000,"Large":29000,"1 Liter":85000}},{"name":"Hazelnut Choco Milk Tea","category":"Non Coffee / Tea","prices":{"Regular":22000,"Large":29000}},{"name":"Kenangan Milk Tea","category":"Non Coffee / Tea","prices":{"Regular":21000,"Large":27000}},{"name":"Susu Sultan Boba Gula Aren","category":"Non Coffee / Tea","prices":{"Regular":24000}},{"name":"Kenangan Milk Tea with Sultan Boba","category":"Non Coffee / Tea","prices":{"Regular":22000}},{"name":"Kenangan Milk Tea with Grass Jelly Gula Aren","category":"Non Coffee / Tea","prices":{"Regular":22000}},{"name":"Jasmine Earl Grey Milk Tea","category":"Non Coffee / Tea","prices":{"Regular":18000}},{"name":"Thai Green Tea","category":"Non Coffee / Tea","prices":{"Regular":19000}},{"name":"Raspberry Hibiscus Lemon Tea","category":"Non Coffee / Tea","prices":{"Regular":20000}},{"name":"99% Jus Jeruk","category":"Non Coffee / Tea","prices":{"Regular":24000}},{"name":"100% Cokelat","category":"Non Coffee / Tea","prices":{"Regular":28000}},{"name":"Kopi Kenangan Mantan Frappe","category":"Frappe","prices":{"Regular":27000,"Large":34000}},{"name":"Dutch Choco Kenangan Frappe","category":"Frappe","prices":{"Regular":29000,"Large":36000}},{"name":"Vanilla Kenangan Frappe","category":"Frappe","prices":{"Regular":25000,"Large":32000}},{"name":"Butterscotch Kenangan Frappe","category":"Frappe","prices":{"Regular":33000,"Large":40000}},{"name":"Matcha Kenangan Frappe","category":"Frappe","prices":{"Regular":33000,"Large":40000}},{"name":"Strawberry Cromboloni","category":"Snack / Food","prices":{"1 pcs":28000}},{"name":"Sugar Donut","category":"Snack / Food","prices":{"1 pcs":12000}},{"name":"Choco Chip Cookies","category":"Snack / Food","prices":{"1 pcs":16000}},{"name":"Chocolate Croissant","category":"Snack / Food","prices":{"1 pcs":21000}},{"name":"Original KrunChi","category":"Snack / Food","prices":{"1 pcs":19000,"2 pcs":36000,"5 pcs":90000}},{"name":"ChiMate","category":"Snack / Food","prices":{"2 pcs":40000,"5 pcs":138000}},{"name":"Fish Cake","category":"Snack / Food","prices":{"1 pcs":8000}},{"name":"Chicken Nugget","category":"Snack / Food","prices":{"1 pcs":8000}},{"name":"Chicken Ball","category":"Snack / Food","prices":{"1 pcs":8000}},{"name":"Chizy Fries","category":"Snack / Food","prices":{"1 portion":17000}},{"name":"Chizy Beefy Fries","category":"Snack / Food","prices":{"1 portion":25000}},{"name":"Onion Ring","category":"Snack / Food","prices":{"1 portion":14500}},{"name":"Curly Fries","category":"Snack / Food","prices":{"1 portion":24000}},{"name":"Original Fries","category":"Snack / Food","prices":{"1 portion":14500}},{"name":"Sultan Boba","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Grass Jelly","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Marie Regal","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Oreo","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Espresso Shot","category":"Topping / Add-on","prices":{"Addon":6000}},{"name":"Juwara Beans Upgrade","category":"Topping / Add-on","prices":{"Addon":3000}},{"name":"Oat Milk / Oatside Upgrade","category":"Topping / Add-on","prices":{"Addon":3000}}];
 
@@ -541,13 +403,13 @@ const MENU_DB = [{"name":"Kopi Kenangan Mantan","category":"Coffee Signature","p
 let orderTime = 'before';
 let savedApiKey = '';
 
-// ===== INIT =====
 window.addEventListener('load', () => {
+  buildPhoneGrid();
   const stored = localStorage.getItem('kopken_api_key');
   if (stored) {
     savedApiKey = stored;
     document.getElementById('apiKeyInput').value = stored;
-    document.getElementById('apiStatus').textContent = '✓ API key tersimpan di browser';
+    document.getElementById('apiStatus').textContent = '✓ API key tersimpan';
     document.getElementById('apiStatus').className = 'api-status ok';
   }
 });
@@ -567,193 +429,211 @@ function setTime(t) {
   document.getElementById('btnAfter').classList.toggle('active', t === 'after');
 }
 
-// ===== FORMAT =====
 function rp(n) { return 'Rp' + n.toLocaleString('id-ID'); }
 
 // ===== VOUCHER LOGIC =====
+// Priority: V2 (min50) > V1 (min70, sebelum 11) > V3 (darurat)
 const VOUCHERS = {
-  V1: { label: 'V1 (Min 70rb)', min: 70000, disc: 0.5, maxDisc: 30000, badgeClass: 'badge-v1' },
-  V2: { label: 'V2 (Min 50rb)', min: 50000, disc: 0.5, maxDisc: 30000, badgeClass: 'badge-v2' },
-  V3: { label: 'V3 (Tanpa Min)', min: 0,     disc: 0.5, maxDisc: 35000, badgeClass: 'badge-v3' },
+  V1: { label:'V1 (Min 70rb)', min:70000, maxDisc:30000, badgeClass:'badge-v1' },
+  V2: { label:'V2 (Min 50rb)', min:50000, maxDisc:30000, badgeClass:'badge-v2' },
+  V3: { label:'V3 (Darurat)',  min:0,     maxDisc:35000, badgeClass:'badge-v3' },
 };
 
-function applyVoucher(total, key) {
-  const v = VOUCHERS[key];
-  if (total < v.min) return null;
-  const disc = Math.min(total * v.disc, v.maxDisc);
-  return { key, total, disc, pay: total - disc };
+function calcDisc(total, key) {
+  return Math.min(total * 0.5, VOUCHERS[key].maxDisc);
 }
 
+// Pick best voucher for a group — V3 only if truly no other option
 function bestVoucher(total, beforeEleven) {
-  const keys = beforeEleven ? ['V1','V2','V3'] : ['V2','V3'];
-  let best = null;
-  for (const k of keys) {
-    const r = applyVoucher(total, k);
-    if (r && (!best || r.disc > best.disc)) best = r;
+  // Try V2 first (always preferred)
+  if (total >= 50000) {
+    // If also >=70k and before 11, V1 and V2 give same disc (30k max)
+    // V1 preferred when before 11 because it triggers payment voucher (bayar >=50k)
+    if (beforeEleven && total >= 70000) {
+      return { key:'V1', disc: calcDisc(total,'V1'), ...VOUCHERS.V1 };
+    }
+    return { key:'V2', disc: calcDisc(total,'V2'), ...VOUCHERS.V2 };
   }
-  if (!best) best = { key: 'V3', total, disc: Math.min(total * 0.5, 35000), pay: total - Math.min(total * 0.5, 35000) };
-  return { ...best, ...VOUCHERS[best.key] };
+  // V3 = emergency only
+  return { key:'V3', disc: calcDisc(total,'V3'), ...VOUCHERS.V3 };
 }
 
-// ===== OPTIMIZER =====
-// Expand items (qty > 1 → multiple single items)
+// ===== EXPAND ITEMS =====
 function expandItems(items) {
   const out = [];
   for (const it of items) {
-    for (let i = 0; i < it.qty; i++) {
-      out.push({ name: it.name, size: it.size, price: it.price });
-    }
+    for (let i = 0; i < it.qty; i++) out.push({ name:it.name, size:it.size, price:it.price });
   }
   return out;
 }
 
-// Try all 2^n-1 partitions for small sets, greedy for large
+// ===== CORE OPTIMIZER =====
+// Goal: maximize total discount. V3 only when a group genuinely can't reach 50k.
+// Uses exhaustive subset enumeration for small sets, greedy for large.
 function optimizeVouchers(items, beforeEleven) {
   const flat = expandItems(items);
   if (flat.length === 0) return [];
+
+  const totalAll = flat.reduce((s,i) => s+i.price, 0);
+
+  // If only 1 item, nothing to optimize
   if (flat.length === 1) {
-    const total = flat[0].price;
-    return [{ items: flat, total, ...bestVoucher(total, beforeEleven) }];
+    return [makeGroup(flat, beforeEleven)];
+  }
+  // If total < 50k, still try: maybe one big group is better than splitting
+  // (splitting won't help since no subgroup can reach 50k either)
+  if (totalAll < 50000) {
+    return [makeGroup(flat, beforeEleven)];
   }
 
-  // For ≤8 items, try smart grouping exhaustively
-  // Strategy: find best partition maximizing total discount
-  let best = null;
-  let bestDisc = -1;
-
-  // Try groupings: we use a greedy approach optimized for this use case
-  // Main strategies to try:
-  const strategies = generateStrategies(flat, beforeEleven);
-  for (const groups of strategies) {
-    const totalDisc = groups.reduce((s, g) => s + g.disc, 0);
-    if (totalDisc > bestDisc) {
-      bestDisc = totalDisc;
-      best = groups;
-    }
-  }
-  return best || [makeGroup(flat, beforeEleven)];
+  // Try all partitions for n <= 10, capped at reasonable combos
+  const best = findBestPartition(flat, beforeEleven);
+  return best;
 }
 
 function makeGroup(items, beforeEleven) {
-  const total = items.reduce((s, it) => s + it.price, 0);
-  return { items, total, ...bestVoucher(total, beforeEleven) };
+  const total = items.reduce((s,i) => s+i.price, 0);
+  const v = bestVoucher(total, beforeEleven);
+  return { items, total, ...v };
 }
 
-function generateStrategies(flat, beforeEleven) {
-  const results = [];
+function scorePartition(groups, beforeEleven) {
+  // Base score = total discount
+  let score = groups.reduce((s,g) => s+g.disc, 0);
+  
+  // Penalty for each V3 group: discourage V3 use
+  // A V3 group means we failed to reach 50k — penalize heavily
+  // BUT: if the group total is genuinely small (<=30k), V3 is fine
+  for (const g of groups) {
+    if (g.key === 'V3') {
+      const total = g.total;
+      // If close to 50k (within 5k), penalize hard — should have been merged
+      if (total >= 45000) score -= 20000;
+      // If moderately close (30-45k), penalize moderately
+      else if (total >= 30000) score -= 8000;
+      // If genuinely small (<30k), small penalty only
+      else score -= 1000;
+    }
+  }
+  return score;
+}
+
+function findBestPartition(flat, beforeEleven) {
   const n = flat.length;
+  let bestScore = -1;
+  let bestGroups = null;
 
-  // Strategy 1: all in one group
-  results.push([makeGroup(flat, beforeEleven)]);
+  // Generate candidate partitions into 1, 2, or 3 groups
+  const candidates = [];
 
-  // Strategy 2: try splitting into groups of 1 vs rest
-  for (let i = 0; i < n; i++) {
-    const single = [flat[i]];
-    const rest = flat.filter((_, idx) => idx !== i);
-    results.push([makeGroup(single, beforeEleven), makeGroup(rest, beforeEleven)]);
-  }
+  // 1 group
+  candidates.push([flat.slice()]);
 
-  // Strategy 3: try all pairs
-  for (let i = 0; i < n - 1; i++) {
-    for (let j = i + 1; j < n; j++) {
-      const pair = [flat[i], flat[j]];
-      const rest = flat.filter((_, idx) => idx !== i && idx !== j);
-      if (rest.length > 0) {
-        results.push([makeGroup(pair, beforeEleven), makeGroup(rest, beforeEleven)]);
+  // 2 groups: all ways to split flat into two non-empty subsets
+  // Use bitmask for n <= 12
+  if (n <= 14) {
+    for (let mask = 1; mask < (1 << n) - 1; mask++) {
+      const g1 = [], g2 = [];
+      for (let i = 0; i < n; i++) {
+        if (mask & (1 << i)) g1.push(flat[i]); else g2.push(flat[i]);
       }
+      candidates.push([g1, g2]);
+    }
+  } else {
+    // Greedy for large sets: try sorted splits
+    const sorted = [...flat].sort((a,b) => b.price - a.price);
+    for (let split = 1; split < sorted.length; split++) {
+      candidates.push([sorted.slice(0, split), sorted.slice(split)]);
     }
   }
 
-  // Strategy 4: group by reaching 50k threshold
-  // Sort descending and try to form ~50k groups
-  const sorted = [...flat].sort((a, b) => b.price - a.price);
-  let group50 = [], group50total = 0, leftover = [];
-  for (const it of sorted) {
-    if (group50total < 50000) {
-      group50.push(it);
-      group50total += it.price;
-    } else {
-      leftover.push(it);
+  // 3 groups: try splitting one of the 2-group candidates further
+  // Only for small n to avoid explosion
+  if (n <= 8) {
+    for (let m1 = 1; m1 < (1<<n)-2; m1++) {
+      const g1 = [], rest = [];
+      for (let i = 0; i < n; i++) {
+        if (m1 & (1<<i)) g1.push(flat[i]); else rest.push(flat[i]);
+      }
+      if (rest.length < 2) continue;
+      for (let m2 = 1; m2 < (1<<rest.length)-1; m2++) {
+        const g2 = [], g3 = [];
+        for (let i = 0; i < rest.length; i++) {
+          if (m2 & (1<<i)) g2.push(rest[i]); else g3.push(rest[i]);
+        }
+        candidates.push([g1, g2, g3]);
+      }
+      // cap to avoid too many
+      if (candidates.length > 3000) break;
     }
   }
-  if (group50.length > 0 && leftover.length > 0) {
-    results.push([makeGroup(group50, beforeEleven), makeGroup(leftover, beforeEleven)]);
-  }
-  if (group50.length > 0 && leftover.length === 0) {
-    results.push([makeGroup(group50, beforeEleven)]);
-  }
 
-  // Strategy 5: split into 3 groups (each trying to hit 50k)
-  if (n >= 3) {
-    const s = [...flat].sort((a, b) => b.price - a.price);
-    const g1 = [], g2 = [], g3 = [];
-    let t1 = 0, t2 = 0, t3 = 0;
-    for (const it of s) {
-      if (t1 < 50000) { g1.push(it); t1 += it.price; }
-      else if (t2 < 50000) { g2.push(it); t2 += it.price; }
-      else { g3.push(it); t3 += it.price; }
+  for (const partition of candidates) {
+    const groups = partition.map(g => makeGroup(g, beforeEleven));
+    const score = scorePartition(groups, beforeEleven);
+    if (score > bestScore) {
+      bestScore = score;
+      bestGroups = groups;
     }
-    const gs = [g1, g2, g3].filter(g => g.length > 0);
-    if (gs.length > 1) results.push(gs.map(g => makeGroup(g, beforeEleven)));
   }
 
-  return results;
+  return bestGroups || [makeGroup(flat, beforeEleven)];
 }
 
 // ===== AI CALL =====
 async function callAI(orderText) {
-  if (!savedApiKey) throw new Error('API key belum diisi! Isi dulu di bagian atas.');
+  if (!savedApiKey) throw new Error('API key belum diisi!');
 
   const menuList = MENU_DB.map(m => {
-    const prices = Object.entries(m.prices).map(([s, p]) => `${s}:${p}`).join(', ');
+    const prices = Object.entries(m.prices).map(([s,p]) => `${s}:${p}`).join(', ');
     return `${m.name} [${m.category}] (${prices})`;
   }).join('\n');
 
-  const systemPrompt = `Kamu adalah parser pesanan Kopi Kenangan. 
+  const systemPrompt = `Kamu adalah parser pesanan Kopi Kenangan.
 
-DATABASE MENU (format: nama [kategori] (ukuran:harga)):
+DATABASE MENU (nama [kategori] (ukuran:harga_idr)):
 ${menuList}
 
-TUGASMU:
-- Baca teks pesanan dalam format apapun (bisa ada emoji, bullet, angka harga di teks — ABAIKAN harga di teks)
-- Kenali: nama menu, ukuran (Regular/Large/1 Liter), qty
-- Ukuran default = Regular kecuali ada kata Large/L/large
-- Frappe = cari menu Frappe yang cocok di database
-- Gunakan HARGA DARI DATABASE, bukan harga di teks pesanan
-- Jika ada menu tidak dikenali atau tidak ada di database, masukkan ke unknown_items
-- Jika nama mirip tapi tidak exact match, ambil yang paling dekat
+TUGAS UTAMA:
+- Baca teks pesanan format apapun (ada emoji, bullet, harga di teks — ABAIKAN semua harga di teks)
+- Kenali: nama menu, ukuran, qty
+- Default ukuran = Regular KECUALI ada kata: Large / L / large / besar
+- Cocokkan nama ke database (fuzzy match). Frappe → kategori Frappe
+- Harga WAJIB dari database, BUKAN dari teks pesanan
+- Non-menu (kantung belanja, biaya layanan, ongkir, dll) → ABAIKAN sepenuhnya, jangan masukkan ke items
 
-RESPOND ONLY in valid JSON, no markdown, no preamble:
-{
-  "items": [
-    {"name": "nama menu sesuai database", "size": "Regular|Large|1 Liter|1 pcs|Addon|dll", "qty": 1, "price": 18000}
-  ],
-  "unknown_items": ["item yang tidak dikenali"],
-  "notes": "catatan jika ada"
-}`;
+ATURAN BUNDLING — SANGAT PENTING:
+- Jika ada item seperti "Bundling Hemat 2 Large", "paket 2 KKM Large", "2x KKM", dll → expand menjadi item-item individual
+- Contoh: "Bundling Hemat 2 Large (2x KKM/Kenangan Mantan)" → 2 item: {name:"Kopi Kenangan Mantan", size:"Large", qty:1, price:25000} x2
+- Selalu gunakan qty terpisah per item, JANGAN qty:2 dalam satu item — pisahkan jadi dua baris
+- Catatan bundling (note di dalam pesanan) = deskripsi isi bundling → parse isinya
+- KKM = Kopi Kenangan Mantan
+- Less Sugar / Less Ice / Extra Shot = ABAIKAN (hanya modifier, tidak ubah harga)
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+RESPOND ONLY valid JSON, no markdown, no extra text:
+{"items":[{"name":"nama sesuai database","size":"Regular","qty":1,"price":18000}],"unknown_items":[],"notes":""}`;
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${savedApiKey}` },
+    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${savedApiKey}` },
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       max_tokens: 1000,
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: orderText }
+        { role:'system', content: systemPrompt },
+        { role:'user', content: orderText }
       ]
     })
   });
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error ${response.status}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${res.status}`);
   }
 
-  const data = await response.json();
+  const data = await res.json();
   const text = data.choices?.[0]?.message?.content || '';
-  const clean = text.replace(/```json|```/g, '').trim();
-  return JSON.parse(clean);
+  return JSON.parse(text.replace(/```json|```/g,'').trim());
 }
 
 // ===== RENDER =====
@@ -765,7 +645,7 @@ function renderResults(groups, unknownItems, notes) {
   groups.forEach((g, i) => {
     grandTotal += g.total;
     grandDisc += g.disc;
-    grandPay += g.pay;
+    grandPay += (g.total - g.disc);
 
     const card = document.createElement('div');
     card.className = 'order-card';
@@ -777,10 +657,11 @@ function renderResults(groups, unknownItems, notes) {
       </div>`
     ).join('');
 
-    const hasPayVoucher = g.key === 'V1' && g.pay >= 50000;
-    const payNote = hasPayVoucher
-      ? `<div class="pay-note">💳 Bayar ${rp(g.pay)} → eligible voucher pembayaran min 50rb!</div>`
-      : '';
+    const pay = g.total - g.disc;
+    const payNote = (g.key === 'V1' && pay >= 50000)
+      ? `<div class="pay-note">💳 Bayar ${rp(pay)} → bisa pakai voucher pembayaran min 50rb!</div>` : '';
+    const v3note = g.key === 'V3'
+      ? `<div class="v3-note">⚠️ Voucher darurat — total ${rp(g.total)} tidak cukup untuk min 50rb</div>` : '';
 
     card.innerHTML = `
       <div class="order-head">
@@ -789,56 +670,39 @@ function renderResults(groups, unknownItems, notes) {
       </div>
       <div class="order-items">${itemRows}</div>
       <div class="order-foot">
-        <div class="foot-col">
-          <div class="foot-lbl">Subtotal</div>
-          <div class="foot-val">${rp(g.total)}</div>
-        </div>
-        <div class="foot-col">
-          <div class="foot-lbl">Diskon</div>
-          <div class="foot-val disc">−${rp(g.disc)}</div>
-        </div>
-        <div class="foot-col">
-          <div class="foot-lbl">Bayar</div>
-          <div class="foot-val pay">${rp(g.pay)}</div>
-        </div>
+        <div class="foot-col"><div class="foot-lbl">Subtotal</div><div class="foot-val">${rp(g.total)}</div></div>
+        <div class="foot-col"><div class="foot-lbl">Diskon</div><div class="foot-val disc">−${rp(g.disc)}</div></div>
+        <div class="foot-col"><div class="foot-lbl">Bayar</div><div class="foot-val">${rp(pay)}</div></div>
       </div>
-      ${payNote}
+      ${payNote}${v3note}
     `;
     container.appendChild(card);
   });
 
-  // Summary
-  const savePct = grandTotal > 0 ? Math.round(grandDisc / grandTotal * 100) : 0;
-  const summaryBlock = document.getElementById('summaryBlock');
-  summaryBlock.innerHTML = `
+  const savePct = grandTotal > 0 ? Math.round(grandDisc/grandTotal*100) : 0;
+  document.getElementById('summaryBlock').innerHTML = `
     <div class="summary-block">
       <div class="summary-head">RINGKASAN TOTAL</div>
       <div class="summary-rows">
         <div class="sum-row"><span class="sum-lbl">Total semua item</span><span class="sum-val">${rp(grandTotal)}</span></div>
-        <div class="sum-row"><span class="sum-lbl">Total hemat voucher</span><span class="sum-val green">−${rp(grandDisc)} (${savePct}%)</span></div>
-        <div class="sum-row"><span class="sum-lbl">Total yang kamu bayar</span><span class="sum-val big">${rp(grandPay)}</span></div>
+        <div class="sum-row"><span class="sum-lbl">Total hemat</span><span class="sum-val green">−${rp(grandDisc)} (${savePct}%)</span></div>
+        <div class="sum-row"><span class="sum-lbl">Total bayar</span><span class="sum-val big">${rp(grandPay)}</span></div>
         <div class="sum-row"><span class="sum-lbl">Jumlah transaksi</span><span class="sum-val">${groups.length}x checkout</span></div>
       </div>
     </div>
   `;
 
-  // Notes / unknown
-  const parsedNote = document.getElementById('parsedNote');
   let noteHtml = '';
-  if (unknownItems && unknownItems.length > 0) {
-    noteHtml += `<div class="warn-box">⚠️ Item tidak dikenali di database: ${unknownItems.join(', ')}</div>`;
-  }
-  if (notes) {
-    noteHtml += `<div class="parsed-note"><div class="parsed-note-title">Catatan AI</div>${notes}</div>`;
-  }
-  parsedNote.innerHTML = noteHtml;
+  if (unknownItems?.length) noteHtml += `<div class="warn-box">⚠️ Tidak dikenali: ${unknownItems.join(', ')}</div>`;
+  if (notes) noteHtml += `<div class="parsed-note"><div class="parsed-note-title">Catatan</div>${notes}</div>`;
+  document.getElementById('parsedNote').innerHTML = noteHtml;
 }
 
 // ===== MAIN =====
 async function calculate() {
   const input = document.getElementById('orderInput').value.trim();
   if (!input) { showError('Paste pesanan dulu!'); return; }
-  if (!savedApiKey) { showError('Isi dan simpan API key dulu di bagian atas!'); return; }
+  if (!savedApiKey) { showError('Isi dan simpan API key OpenAI dulu!'); return; }
 
   hideError();
   document.getElementById('resultSection').classList.remove('show');
@@ -847,14 +711,12 @@ async function calculate() {
 
   try {
     const parsed = await callAI(input);
-    if (!parsed.items || parsed.items.length === 0) throw new Error('Tidak ada item yang terbaca. Coba paste ulang pesanannya.');
-
+    if (!parsed.items?.length) throw new Error('Tidak ada item terbaca. Coba paste ulang.');
     const groups = optimizeVouchers(parsed.items, orderTime === 'before');
     renderResults(groups, parsed.unknown_items, parsed.notes);
-
     document.getElementById('resultSection').classList.add('show');
-    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } catch (e) {
+    document.getElementById('resultSection').scrollIntoView({ behavior:'smooth', block:'start' });
+  } catch(e) {
     showError(e.message);
   } finally {
     document.getElementById('loading').classList.remove('show');
