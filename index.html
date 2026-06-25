@@ -157,16 +157,40 @@ textarea::placeholder { color: var(--gray-400); }
 .phone-num { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--black); }
 .phone-card.used .phone-num { color: var(--gray-400); text-decoration: line-through; }
 .phone-copy-lbl { font-family: var(--mono); font-size: 9px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
-.phone-actions { display: flex; border-top: 1px solid var(--gray-100); }
-.phone-action-btn { flex: 1; padding: 6px 4px; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; cursor: pointer; background: none; border: none; color: var(--gray-600); transition: background 0.12s; }
+.phone-actions { display: flex; border-top: 1px solid var(--gray-100); flex-wrap: wrap; }
+.phone-action-btn { flex: 1; min-width: 0; padding: 6px 4px; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; text-align: center; cursor: pointer; background: none; border: none; color: var(--gray-600); transition: background 0.12s; border-right: 1px solid var(--gray-100); }
+.phone-action-btn:last-child { border-right: none; }
 .phone-action-btn:active { background: var(--gray-100); }
-.used-btn {}
-.restore-btn { display: none; color: #2a7a2a; }
-.phone-card.used .used-btn { display: none; }
-.phone-card.used .restore-btn { display: block; flex: 1; }
-.phone-card.used .phone-actions { background: #f0fff0; border-top-color: #c8e6c8; }
+.used-btn { color: #c00; }
+.half-btn { color: #e6a817; }
+.restore-btn { color: #2a7a2a; }
+/* used state: red tint on number */
+.phone-card.used .phone-num { color: #c00; text-decoration: line-through; }
+.phone-card.used .used-btn { color: #c00; font-weight: 700; }
+/* half state: yellow tint */
+.phone-card.half .phone-num { color: #7a6a00; }
+.phone-card.half .half-btn { color: #e6a817; font-weight: 700; }
+/* both: combined style */
+.phone-card.used.half { border-color: #e8d890; background: #fffbf0; }
+.phone-card.used.half .phone-num { color: #c00; text-decoration: line-through; }
 .phone-stats { font-family: var(--mono); font-size: 10px; color: var(--gray-400); margin-top: 14px; text-align: center; }
 .phone-stats span { color: var(--black); font-weight: 600; }
+/* ===== KODE VOUCHER PAGE ===== */
+.kode-page { padding: 18px 20px; }
+.kode-header { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start; }
+.kode-title { font-family: var(--mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-600); margin-bottom: 4px; }
+.kode-sub { font-size: 11px; color: var(--gray-400); font-family: var(--mono); }
+.kode-reset-btn { font-family: var(--mono); font-size: 10px; background: none; border: 1px solid var(--gray-200); border-radius: 6px; padding: 5px 10px; color: var(--gray-600); cursor: pointer; }
+.kode-list { display: flex; flex-direction: column; gap: 8px; }
+.kode-row { display: flex; align-items: center; border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden; background: white; }
+.kode-num { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--gray-400); width: 36px; text-align: center; flex-shrink: 0; padding: 14px 0; }
+.kode-divider { width: 1px; background: var(--gray-100); align-self: stretch; }
+.kode-val { font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--black); flex: 1; text-align: center; padding: 14px 0; letter-spacing: 3px; transition: color 0.15s; }
+.kode-val.zero { color: var(--gray-200); }
+.kode-btn { width: 48px; display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; font-size: 18px; color: var(--gray-400); padding: 14px 0; transition: background 0.12s; flex-shrink: 0; }
+.kode-btn:active { background: var(--gray-100); }
+.kode-btn.prev { border-right: 1px solid var(--gray-100); }
+.kode-btn.next { border-left: 1px solid var(--gray-100); }
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   background: var(--black); color: var(--white); font-family: var(--mono);
@@ -175,99 +199,179 @@ textarea::placeholder { color: var(--gray-400); }
   white-space: nowrap;
 }
 .toast.show { opacity: 1; }
+/* ===== DESKTOP 3-COLUMN LAYOUT ===== */
+.desktop-col-header {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 12px 16px; background: var(--black); color: var(--white);
+  position: sticky; top: 0; z-index: 10;
+  display: none;
+}
+
+.app-layout {
+  display: block;
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+}
+
+@media (min-width: 900px) {
+  #mobileNav { display: none !important; }
+
+  .app-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .panel {
+    display: flex !important;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--gray-100);
+  }
+
+  .panel:last-child { border-right: none; }
+
+  .panel-voucher { width: 30%; }
+  .panel-phone  { width: 50%; }
+  .panel-kode   { width: 20%; }
+
+  .desktop-col-header { display: block; }
+
+  body { padding-bottom: 0; }
+
+  /* Voucher column: compact api section */
+  .panel-voucher .api-section { padding: 10px 14px; }
+  .panel-voucher .main { padding: 12px 14px; }
+  .panel-voucher textarea { height: 140px; }
+
+  /* Phone column: 2-col grid stays */
+  .panel-phone .phone-page { padding: 12px 14px 80px; }
+  .panel-phone .phone-header { margin-bottom: 8px; }
+
+  /* Kode column: single column list */
+  .panel-kode .kode-page { padding: 12px 10px 80px; }
+  .panel-kode .kode-list { gap: 6px; }
+  .panel-kode .kode-val { font-size: 18px; padding: 10px 0; }
+  .panel-kode .kode-btn { padding: 10px 0; }
+  .panel-kode .kode-num { padding: 10px 0; font-size: 11px; }
+}
+
+@media (max-width: 899px) {
+  .desktop-col-header { display: none !important; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+}
+
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<div class="nav-tabs">
-  <div class="nav-tab active" onclick="switchPage('voucher')">☕ Voucher Calc</div>
+<!-- MOBILE NAV (hidden on desktop) -->
+<div class="nav-tabs" id="mobileNav">
+  <div class="nav-tab active" onclick="switchPage('voucher')">☕ Voucher</div>
   <div class="nav-tab" onclick="switchPage('phone')">📞 Nomor CS</div>
+  <div class="nav-tab" onclick="switchPage('kode')">🎟 Kode VCR</div>
 </div>
 
-<!-- ===== PAGE: VOUCHER ===== -->
-<div class="page active" id="page-voucher">
+<!-- DESKTOP SPLIT + MOBILE PAGES wrapper -->
+<div class="app-layout">
 
-  <div class="api-section">
-    <div class="api-row">
-      <div class="api-label">API Key</div>
-      <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-..." />
-      <button class="api-save-btn" onclick="saveApiKey()">Simpan</button>
-    </div>
-    <div class="api-status no" id="apiStatus">Belum ada API key tersimpan</div>
-    <div class="menu-status" id="menuStatusRow">
-      <div class="menu-status-dot loading" id="menuStatusDot"></div>
-      <span id="menuStatusText" style="color:#e6a817">Memuat data menu dari server...</span>
-    </div>
-  </div>
-
-  <div class="voucher-strip">
-    <div class="vs-item">
-      <div class="vs-tag v1">V1</div>
-      <div class="vs-pct">50%</div>
-      <div class="vs-detail">Min 70rb<br>Maks hemat 30rb<br><b>Sebelum 11.00</b></div>
-    </div>
-    <div class="vs-item">
-      <div class="vs-tag v2">V2</div>
-      <div class="vs-pct">50%</div>
-      <div class="vs-detail">Min 50rb<br>Maks hemat 30rb<br><b>Prioritas utama</b></div>
-    </div>
-    <div class="vs-item">
-      <div class="vs-tag v3">V3</div>
-      <div class="vs-pct">50%</div>
-      <div class="vs-detail">Tanpa min<br>Maks hemat 35rb<br><b>Darurat saja</b></div>
-    </div>
-  </div>
-
-  <div class="main">
-    <div class="time-row">
-      <div class="time-label">Jam Order</div>
-      <div class="time-toggle">
-        <button class="time-btn active" id="btnBefore" onclick="setTime('before')">Sebelum 11.00</button>
-        <button class="time-btn" id="btnAfter" onclick="setTime('after')">Setelah 11.00</button>
+  <!-- PANEL: VOUCHER (30% desktop, full mobile) -->
+  <div class="panel panel-voucher" id="page-voucher">
+    <div class="desktop-col-header">☕ Voucher Calc</div>
+    <div class="api-section">
+      <div class="api-row">
+        <div class="api-label">API Key</div>
+        <input type="password" class="api-input" id="apiKeyInput" placeholder="sk-..." />
+        <button class="api-save-btn" onclick="saveApiKey()">Simpan</button>
+      </div>
+      <div class="api-status no" id="apiStatus">Belum ada API key tersimpan</div>
+      <div class="menu-status" id="menuStatusRow">
+        <div class="menu-status-dot loading" id="menuStatusDot"></div>
+        <span id="menuStatusText" style="color:#e6a817">Memuat data menu dari server...</span>
       </div>
     </div>
-
-    <div class="input-label">Paste Pesanan</div>
-    <textarea id="orderInput" placeholder="Paste format pesanan dari customer:
+    <div class="voucher-strip">
+      <div class="vs-item">
+        <div class="vs-tag v1">V1</div><div class="vs-pct">50%</div>
+        <div class="vs-detail">Min 70rb<br>Maks hemat 30rb<br><b>Sebelum 11.00</b></div>
+      </div>
+      <div class="vs-item">
+        <div class="vs-tag v2">V2</div><div class="vs-pct">50%</div>
+        <div class="vs-detail">Min 50rb<br>Maks hemat 30rb<br><b>Prioritas utama</b></div>
+      </div>
+      <div class="vs-item">
+        <div class="vs-tag v3">V3</div><div class="vs-pct">50%</div>
+        <div class="vs-detail">Tanpa min<br>Maks hemat 35rb<br><b>Darurat saja</b></div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="time-row">
+        <div class="time-label">Jam Order</div>
+        <div class="time-toggle">
+          <button class="time-btn active" id="btnBefore" onclick="setTime('before')">Sebelum 11.00</button>
+          <button class="time-btn" id="btnAfter" onclick="setTime('after')">Setelah 11.00</button>
+        </div>
+      </div>
+      <div class="input-label">Paste Pesanan</div>
+      <textarea id="orderInput" placeholder="Paste format pesanan dari customer:
 
 • 2x Kopi Kenangan Mantan Rp 28.000
 • 2x Kopi Kenangan Mantan (Large) Rp 38.000
 • 1x Thai Tea Rp 15.000
 
 Harga di teks diabaikan — pakai harga database."></textarea>
-
-    <button class="calc-btn" id="calcBtn" onclick="calculate()">→ HITUNG VOUCHER OPTIMAL</button>
-    <div class="error-box" id="errorBox"></div>
-    <div class="loading" id="loading">
-      <div class="ld-bar"><div class="ld-fill"></div></div>
-      <div class="ld-text">Membaca pesanan & mencari kombinasi terbaik...</div>
-    </div>
-
-    <div class="result-section" id="resultSection">
-      <div class="divider"></div>
-      <div class="section-label">Hasil Optimasi Voucher</div>
-      <div id="ordersContainer"></div>
-      <div id="summaryBlock"></div>
-      <div id="parsedNote"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== PAGE: PHONE ===== -->
-<div class="page" id="page-phone">
-  <div class="phone-page">
-    <div class="phone-header">
-      <div>
-        <div class="phone-title">Nomor CS / Outlet</div>
-        <div class="phone-sub">Tap nomor → salin · tandai terpakai</div>
+      <button class="calc-btn" id="calcBtn" onclick="calculate()">→ HITUNG VOUCHER OPTIMAL</button>
+      <div class="error-box" id="errorBox"></div>
+      <div class="loading" id="loading">
+        <div class="ld-bar"><div class="ld-fill"></div></div>
+        <div class="ld-text">Membaca pesanan & mencari kombinasi terbaik...</div>
       </div>
-      <button class="phone-reset-btn" onclick="resetAllUsed()">Reset Semua</button>
+      <div class="result-section" id="resultSection">
+        <div class="divider"></div>
+        <div class="section-label">Hasil Optimasi Voucher</div>
+        <div id="ordersContainer"></div>
+        <div id="summaryBlock"></div>
+        <div id="parsedNote"></div>
+      </div>
     </div>
-    <div id="fbStatus" style="font-family:var(--mono);font-size:10px;color:#e6a817;margin-bottom:12px;">⏳ Menghubungkan ke Firebase...</div>
-    <div class="phone-grid" id="phoneGrid"></div>
-    <div class="phone-stats" id="phoneStats"></div>
   </div>
+
+  <!-- PANEL: NOMOR CS (50% desktop, full mobile) -->
+  <div class="panel panel-phone" id="page-phone">
+    <div class="desktop-col-header">📞 Nomor CS / Outlet</div>
+    <div class="phone-page" style="padding:0 0 80px 0">
+      <div class="phone-header">
+        <div><div class="phone-title">Nomor CS / Outlet</div><div class="phone-sub">Tap nomor → salin · tandai terpakai</div></div>
+        <button class="phone-reset-btn" onclick="resetAllUsed()">Reset Semua</button>
+      </div>
+      <div id="fbStatus" style="font-family:var(--mono);font-size:10px;color:#e6a817;margin-bottom:12px;">⏳ Menghubungkan ke Firebase...</div>
+      <div class="phone-grid" id="phoneGrid"></div>
+      <div class="phone-stats" id="phoneStats"></div>
+    </div>
+  </div>
+
+  <!-- PANEL: KODE VCR (20% desktop, full mobile) -->
+  <div class="panel panel-kode" id="page-kode">
+    <div class="desktop-col-header">🎟 Kode VCR</div>
+    <div class="kode-page" style="padding:0 0 80px 0">
+      <div class="kode-header">
+        <div><div class="kode-title">Kode Voucher</div><div class="kode-sub">‹ › ganti · sync real-time</div></div>
+        <button class="kode-reset-btn" onclick="resetKode()">Reset</button>
+      </div>
+      <div id="kodeStatus" style="font-family:var(--mono);font-size:10px;color:#e6a817;margin-bottom:12px;">⏳ Memuat...</div>
+      <div class="kode-list" id="kodeList"></div>
+    </div>
+  </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -275,11 +379,23 @@ Harga di teks diabaikan — pakai harga database."></textarea>
 <script>
 // ===== NAVIGATION =====
 function switchPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   event.target.classList.add('active');
 }
+
+// On desktop, all panels always visible - activate all on load
+function initLayout() {
+  if (window.innerWidth >= 900) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.add('active'));
+  } else {
+    // Mobile: only first panel active
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-voucher').classList.add('active');
+  }
+}
+window.addEventListener('resize', initLayout);
 
 // ===== PHONE NUMBERS =====
 const PHONES = [
@@ -361,83 +477,102 @@ const FIREBASE_CONFIG = {
 };
 
 let firebaseReady = false;
-let usedSet = new Set();
 let dbRef = null;
 
 async function initFirebase() {
   const statusEl = document.getElementById('fbStatus');
+  const kodeStatusEl = document.getElementById('kodeStatus');
   try {
-    // Import Firebase dari CDN
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const { getDatabase, ref, onValue, set } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
 
     if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === 'GANTI_API_KEY') {
       if (statusEl) statusEl.innerHTML = '⚠️ Firebase belum dikonfigurasi — pakai mode lokal';
-      loadFromLocalStorage();
+      if (kodeStatusEl) kodeStatusEl.innerHTML = '⚠️ Mode lokal';
+      buildKodeList();
       return;
     }
 
     const app = initializeApp(FIREBASE_CONFIG);
     const db = getDatabase(app);
-    dbRef = ref(db, 'kopken/used_phones');
+    window._fbSet = set;
+    window._fbRef = ref;
+    window._fbDb = db;
+    firebaseReady = true;
 
-    // Listen real-time — otomatis update semua perangkat
-    onValue(dbRef, (snapshot) => {
+    // Listen phone state real-time
+    const phonesRef = ref(db, 'kopken/phone_state_v2');
+    onValue(phonesRef, (snapshot) => {
       const data = snapshot.val();
-      usedSet = new Set(data ? Object.keys(data).filter(k => data[k]) : []);
+      phoneState = data || {};
       refreshAllCards();
       updateStats();
       if (statusEl) statusEl.innerHTML = '🟢 Sync aktif — update real-time';
     });
+    window._dbRef = phonesRef;
+    window._fbSavePath = 'kopken/phone_state_v2';
 
-    firebaseReady = true;
-    window._fbSet = set;
-    window._dbRef = dbRef;
-    window._fbRef = ref;
-    window._fbDb = db;
+    // Listen kode vcr real-time
+    const kodeRef = ref(db, 'kopken/kode_vcr');
+    onValue(kodeRef, (snapshot) => {
+      const data = snapshot.val();
+      if (Array.isArray(data)) kodeValues = data;
+      buildKodeList();
+      if (kodeStatusEl) kodeStatusEl.innerHTML = '🟢 Sync aktif — update real-time';
+    });
 
   } catch(e) {
     console.error('Firebase error:', e);
     if (statusEl) statusEl.innerHTML = '⚠️ Firebase gagal — pakai mode lokal';
-    loadFromLocalStorage();
+    if (kodeStatusEl) kodeStatusEl.innerHTML = '⚠️ Mode lokal';
+    buildKodeList();
   }
-}
-
-function loadFromLocalStorage() {
-  try { usedSet = new Set(JSON.parse(localStorage.getItem('kopken_used_phones') || '[]')); }
-  catch { usedSet = new Set(); }
-  refreshAllCards();
-  updateStats();
 }
 
 async function saveToFirebase() {
-  if (!firebaseReady || !window._fbSet || !window._dbRef) {
-    localStorage.setItem('kopken_used_phones', JSON.stringify([...usedSet]));
-    return;
-  }
-  const data = {};
-  usedSet.forEach(n => { data[n] = true; });
+  if (!firebaseReady || !window._fbSet || !window._dbRef) return;
   try {
-    await window._fbSet(window._dbRef, data);
+    await window._fbSet(window._dbRef, phoneState);
   } catch(e) {
     console.error('Save error:', e);
   }
+}
+
+// phoneState[num] = { used: bool, half: bool }
+let phoneState = {};
+
+function getCardClasses(num) {
+  const s = phoneState[num] || {};
+  let cls = 'phone-card';
+  if (s.used) cls += ' used';
+  if (s.half) cls += ' half';
+  return cls;
 }
 
 function refreshAllCards() {
   PHONES.forEach((num, i) => {
     const card = document.getElementById('ph-' + i);
     if (!card) return;
-    if (usedSet.has(num)) card.classList.add('used');
-    else card.classList.remove('used');
+    const s = phoneState[num] || {};
+    card.classList.toggle('used', !!s.used);
+    card.classList.toggle('half', !!s.half);
+    // Update button labels
+    const usedBtn = card.querySelector('.used-btn');
+    const halfBtn = card.querySelector('.half-btn');
+    if (usedBtn) usedBtn.textContent = s.used ? '✓ Terpakai' : '✕ Terpakai';
+    if (halfBtn) halfBtn.textContent = s.half ? '✓ Sisa 50%' : '½ Sisa 50%';
+    // Show/hide restore
+    const restoreBtn = card.querySelector('.restore-btn');
+    if (restoreBtn) restoreBtn.style.display = (s.used || s.half) ? '' : 'none';
   });
 }
 
 function buildPhoneGrid() {
   const grid = document.getElementById('phoneGrid');
   PHONES.forEach((num, i) => {
+    const s = phoneState[num] || {};
     const card = document.createElement('div');
-    card.className = 'phone-card' + (usedSet.has(num) ? ' used' : '');
+    card.className = getCardClasses(num);
     card.id = 'ph-' + i;
     card.innerHTML = `
       <div class="phone-top" onclick="copyPhone('${num}', ${i})">
@@ -445,8 +580,9 @@ function buildPhoneGrid() {
         <span class="phone-copy-lbl">salin</span>
       </div>
       <div class="phone-actions">
-        <button class="phone-action-btn used-btn" onclick="markUsed('${num}', ${i})">✕ Sudah Terpakai</button>
-        <button class="phone-action-btn restore-btn" onclick="restorePhone('${num}', ${i})">↩ Pulihkan</button>
+        <button class="phone-action-btn used-btn" onclick="markUsed('${num}', ${i})">${s.used ? '✓ Terpakai' : '✕ Terpakai'}</button>
+        <button class="phone-action-btn half-btn" onclick="markHalf('${num}', ${i})">${s.half ? '✓ Sisa 50%' : '½ Sisa 50%'}</button>
+        <button class="phone-action-btn restore-btn" style="display:${(s.used||s.half)?'':'none'}" onclick="restorePhone('${num}', ${i})">↩ Pulihkan</button>
       </div>
     `;
     grid.appendChild(card);
@@ -457,7 +593,6 @@ function buildPhoneGrid() {
 
 function copyPhone(num, idx) {
   const card = document.getElementById('ph-' + idx);
-  if (card.classList.contains('used')) return;
   const full = '0' + num;
   const doFlash = () => {
     const lbl = card.querySelector('.phone-copy-lbl');
@@ -475,16 +610,26 @@ function copyPhone(num, idx) {
 }
 
 async function markUsed(num, idx) {
-  usedSet.add(num);
-  document.getElementById('ph-' + idx).classList.add('used');
+  if (!phoneState[num]) phoneState[num] = {};
+  phoneState[num].used = !phoneState[num].used;
+  refreshAllCards();
   updateStats();
-  showToast('Ditandai terpakai');
+  showToast(phoneState[num].used ? 'Ditandai terpakai' : 'Terpakai dilepas');
+  await saveToFirebase();
+}
+
+async function markHalf(num, idx) {
+  if (!phoneState[num]) phoneState[num] = {};
+  phoneState[num].half = !phoneState[num].half;
+  refreshAllCards();
+  updateStats();
+  showToast(phoneState[num].half ? 'Ditandai sisa 50%' : 'Sisa 50% dilepas');
   await saveToFirebase();
 }
 
 async function restorePhone(num, idx) {
-  usedSet.delete(num);
-  document.getElementById('ph-' + idx).classList.remove('used');
+  phoneState[num] = { used: false, half: false };
+  refreshAllCards();
   updateStats();
   showToast('Dipulihkan');
   await saveToFirebase();
@@ -492,17 +637,83 @@ async function restorePhone(num, idx) {
 
 async function resetAllUsed() {
   if (!confirm('Reset semua nomor ke aktif?')) return;
-  usedSet = new Set();
-  document.querySelectorAll('.phone-card.used').forEach(c => c.classList.remove('used'));
+  phoneState = {};
+  refreshAllCards();
   updateStats();
   await saveToFirebase();
 }
 
 function updateStats() {
   const total = PHONES.length;
-  const usedCount = [...usedSet].filter(n => PHONES.includes(n)).length;
+  const usedCount = PHONES.filter(n => phoneState[n]?.used).length;
+  const halfCount = PHONES.filter(n => phoneState[n]?.half).length;
+  const activeCount = total - PHONES.filter(n => phoneState[n]?.used || phoneState[n]?.half).length;
   const el = document.getElementById('phoneStats');
-  if (el) el.innerHTML = `<span>${total - usedCount}</span> aktif · <span>${usedCount}</span> terpakai dari ${total} nomor`;
+  if (el) el.innerHTML = `<span>${activeCount}</span> aktif · <span>${usedCount}</span> terpakai · <span style="color:#e6a817">${halfCount}</span> sisa 50% dari ${total} nomor`;
+}
+
+// ===== KODE VOUCHER =====
+const KODE_CYCLE = [11, 15, 19, 21, 25, 29, 31, 35, 39];
+let kodeValues = Array(10).fill(0); // 0 = default "00"
+
+function buildKodeList() {
+  const list = document.getElementById('kodeList');
+  if (!list) return;
+  list.innerHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const val = kodeValues[i];
+    const display = val === 0 ? '00' : String(val).padStart(2, '0');
+    const row = document.createElement('div');
+    row.className = 'kode-row';
+    row.id = 'kode-row-' + i;
+    row.innerHTML = `
+      <div class="kode-num">${i + 1}</div>
+      <div class="kode-divider"></div>
+      <button class="kode-btn prev" onclick="kodeStep(${i}, -1)">‹</button>
+      <div class="kode-val${val === 0 ? ' zero' : ''}" id="kode-val-${i}">${display}</div>
+      <button class="kode-btn next" onclick="kodeStep(${i}, 1)">›</button>
+    `;
+    list.appendChild(row);
+  }
+}
+
+async function kodeStep(idx, dir) {
+  const cur = kodeValues[idx];
+  let pos;
+  if (cur === 0) {
+    pos = dir > 0 ? 0 : KODE_CYCLE.length - 1;
+  } else {
+    const curPos = KODE_CYCLE.indexOf(cur);
+    pos = (curPos + dir + KODE_CYCLE.length) % KODE_CYCLE.length;
+  }
+  kodeValues[idx] = KODE_CYCLE[pos];
+  updateKodeRow(idx);
+  await saveKodeToFirebase();
+}
+
+function updateKodeRow(idx) {
+  const val = kodeValues[idx];
+  const display = val === 0 ? '00' : String(val).padStart(2, '0');
+  const el = document.getElementById('kode-val-' + idx);
+  if (!el) return;
+  el.textContent = display;
+  el.className = 'kode-val' + (val === 0 ? ' zero' : '');
+}
+
+async function resetKode() {
+  if (!confirm('Reset semua kode ke 00?')) return;
+  kodeValues = Array(10).fill(0);
+  buildKodeList();
+  await saveKodeToFirebase();
+}
+
+async function saveKodeToFirebase() {
+  if (!firebaseReady || !window._fbSet || !window._fbDb) return;
+  try {
+    const { ref } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+    const kodeRef = ref(window._fbDb, 'kopken/kode_vcr');
+    await window._fbSet(kodeRef, kodeValues);
+  } catch(e) { console.error('Kode save error:', e); }
 }
 
 function showToast(msg) {
@@ -657,6 +868,7 @@ let orderTime = 'before';
 let savedApiKey = '';
 
 window.addEventListener('load', () => {
+  initLayout();
   buildPhoneGrid();
   fetchKKMenu();
   const stored = localStorage.getItem('kopken_api_key');
