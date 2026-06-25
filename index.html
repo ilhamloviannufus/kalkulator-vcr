@@ -351,7 +351,13 @@ const PHONES = [
 // Ganti bagian ini dengan config Firebase kamu!
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCUq8voY3HA00idlgGPR3ykGtxukjEzZLk",
-  databaseURL: "https://kalkulator-kopken-default-rtdb.asia-southeast1.firebasedatabase.app",  // contoh: https://nama-project-default-rtdb.firebaseio.com
+  authDomain: "kalkulator-kopken.firebaseapp.com",
+  databaseURL: "https://kalkulator-kopken-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kalkulator-kopken",
+  storageBucket: "kalkulator-kopken.firebasestorage.app",
+  messagingSenderId: "582178739236",
+  appId: "1:582178739236:web:a5031beee02a4c3fc074b1",
+  measurementId: "G-E8JZQRYNSZ"
 };
 
 let firebaseReady = false;
@@ -365,7 +371,7 @@ async function initFirebase() {
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const { getDatabase, ref, onValue, set } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
 
-    if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === 'AIzaSyCUq8voY3HA00idlgGPR3ykGtxukjEzZLk') {
+    if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === 'GANTI_API_KEY') {
       if (statusEl) statusEl.innerHTML = '⚠️ Firebase belum dikonfigurasi — pakai mode lokal';
       loadFromLocalStorage();
       return;
